@@ -3,12 +3,13 @@
 // Utilisation du framework Express
 
 import express from 'express'
-import route from './route/index.js'
+// fornisseurs du service de routage
+import {home} from './routes/home.js'
 
 const app = express()
 
-//route index
-app.use(route)
+//route
+app.use(home)
 
 app.listen(8090, () => {
     console.log(" [x] server up, to exit press CTRL + C")

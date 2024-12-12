@@ -7,4 +7,4 @@ route.get("/", (req, res, next) => {
     next()
 })
 
-export default route
+export const home = route
