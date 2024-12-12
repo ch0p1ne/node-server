@@ -1,16 +1,24 @@
-// lancement : npm run start
-// et non : node app.js
-// Utilisation du framework Express
-
 import express from 'express'
-// fornisseurs du service de routage
-import {home} from './routes/home.js'
+// fournisseur du service de routage
+import { home } from './routes/producer.js'
+import cors from 'cors'
 
 const app = express()
 
-//route
+// Configuration du middleware CORS
+app.use(cors({
+    origin: 'http://localhost', // Autoriser cette origine uniquement
+    methods: 'GET,POST,PUT,DELETE', // Méthodes HTTP autorisées
+    allowedHeaders: 'Content-Type,Authorization', // En-têtes autorisés
+}));
+
+// Middleware pour parser le JSON
+app.use(express.json())
+
+
+// Route
 app.use(home)
 
 app.listen(8090, () => {
-    console.log(" [x] server up, to exit press CTRL + C")
-})
+    console.log(' [x] Serveur en cours d\'exécution sur http://localhost:8090');
+});
