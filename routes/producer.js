@@ -4,31 +4,31 @@ import { msgIsEmpty } from '../controller/msgController.js'
 
 var route = express.Router()
 
-route.post("/", (req, res, next) => {
+route.post("/", (req, res) => {
     console.log(req.body)
     if (msgIsEmpty(req.body)) {
         res.statusCode = 403 // Interdit
         res.setHeader('content-type', "text/html")
         res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>")
         console.log("Il n'y pas de commande, le panier doit etre vide")
-        next()
+
         return
     }
     produceMessage(req.body)
     res.statusCode = 200 // ok
     res.setHeader('content-type', "text/html")
     res.end("Les donnée ont ete envoyer")
-    next()
+
 })
 
-route.get("/", (req, res, next) => {
+route.get("/", (req, res) => {
     res.statusCode = 405 // no content for this request => pas de contenue pour la route GET /
     res.setHeader('content-type', 'text/html')
 
     var msg = "<h1>ERREUR 405</h1> <p>Pas de contenue a fournir pour la requette vers : " + req.method + ' ' + req.url + '</p>'
 
     res.end(msg)
-    next()
+
 })
 
 export const home = route

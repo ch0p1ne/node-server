@@ -1,6 +1,7 @@
 import express from 'express'
 // fournisseur du service de routage
 import { home } from './routes/producer.js'
+import { consumer } from './routes/consumer.js'
 import cors from 'cors'
 
 const app = express()
@@ -18,6 +19,13 @@ app.use(express.json())
 
 // Route
 app.use(home)
+app.use(consumer)
+
+// gère les route non définie
+app.all( /.*/, function badRequest( req, res, next) {
+    res.status(404).send("<h2>Page introuvable</h2>")
+})
+
 
 app.listen(8090, () => {
     console.log(' [x] Serveur en cours d\'exécution sur http://localhost:8090');
