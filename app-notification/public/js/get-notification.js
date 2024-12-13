@@ -23,14 +23,15 @@ $(document).ready( () => {
 
 async function update(data) {
     var order = []
+    var subOrder = []
 
     if(localStorage.order) {
         order = JSON.parse(localStorage.order) 
     }
 
-    if(Date.length != 0) {
+    if(date.length != 0) {
         for (const i in data) {
-            order.push(data[i][0])
+            order.push(data[i])
         }
     }
     console.log(order)
