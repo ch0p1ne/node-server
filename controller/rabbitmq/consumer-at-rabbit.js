@@ -1,37 +1,50 @@
 #!/usr/bin/env node
 
-var amqp = require('amqplib/callback_api');
+import amqplib from 'amqplib/callback_api.js'
 
-amqp.connect('amqp://localhost', function(error0, connection) {
-  if (error0) {
-    throw error0;
-  }
-  connection.createChannel(function(error1, channel) {
-    if (error1) {
-      throw error1;
+export var msgList = []
+
+export function consumeMsg(exchange, queue) {
+  var jsonMsg = ''
+
+  amqplib.connect('amqp://localhost', function (error0, connection) {
+    if (error0) {
+      throw error0;
     }
-    var exchange = 'logs';
-
-    channel.assertExchange(exchange, 'fanout', {
-      durable: false
-    });
-
-    channel.assertQueue('', {
-      exclusive: true
-    }, function(error2, q) {
-      if (error2) {
-        throw error2;
+    connection.createChannel(function (error1, channel) {
+      if (error1) {
+        throw error1;
       }
-      console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
-      channel.bindQueue(q.queue, exchange, '');
 
-      channel.consume(q.queue, function(msg) {
-      	if(msg.content) {
-	        console.log(" [x] %s", msg.content.toString());
-	      }
-      }, {
-        noAck: true
+      channel.assertExchange(exchange, 'fanout', {
+        durable: true
+      });
+
+      channel.assertQueue(queue, {
+        exclusive: false
+      }, function (error2, q) {
+        if (error2) {
+          throw error2;
+        }
+        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+        channel.bindQueue(queue, exchange, '');
+
+        channel.consume(queue, function (msg) {
+          if (msg.content) {
+            console.log(" \t[x] Message recuperer %s", msg.content.toString());
+            jsonMsg =  msg.content.toString()
+            msgList.push(JSON.parse(jsonMsg))
+            setTimeout(function() {
+              console.log(" \t\t[x] Accuser de reception envoyer");
+              channel.ack(msg);
+            }, 3 * 1000);
+          }
+        }, {
+          noAck: false
+        });
       });
     });
   });
-});
+
+  return jsonMsg
+}

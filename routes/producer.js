@@ -5,12 +5,11 @@ import { msgIsEmpty } from '../controller/msgController.js'
 var route = express.Router()
 
 route.post("/", (req, res) => {
-    console.log(req.body)
     if (msgIsEmpty(req.body)) {
         res.statusCode = 403 // Interdit
         res.setHeader('content-type', "text/html")
         res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>")
-        console.log("Il n'y pas de commande, le panier doit etre vide")
+        console.log("Il n'y pas de commande, la commande doit contenir des article")
 
         return
     }

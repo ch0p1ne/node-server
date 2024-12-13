@@ -24,13 +24,13 @@ function produceMessage(data) {
             }
 
             // Définition du nom de l'échange RabbitMQ
-            const exchange = 'fanout_command_notif';
+            const exchange = 'fanout_notif_command';
             
             // Conversion des données en chaîne JSON
             const msg = JSON.stringify(data);
 
             // Assertion de l'échange avec le type 'fanout' (diffusion aux abonnés)
-            channel.assertExchange(exchange, 'fanout', { durable: false });
+            channel.assertExchange(exchange, 'fanout', { durable: true });
 
             // Envoi du message à l'échange spécifié sans clé de routage
             channel.publish(exchange, '', Buffer.from(msg));
