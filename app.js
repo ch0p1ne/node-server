@@ -9,7 +9,7 @@ const app = express()
 app.use(cors({
     origin: 'http://localhost', // Autoriser cette origine uniquement
     methods: 'GET,POST,PUT,DELETE', // Méthodes HTTP autorisées
-    allowedHeaders: 'Content-Type,Authorization', // En-têtes autorisés
+    allowedHeaders: 'Content-Type,Authorization',  // En-têtes autorisés
 }));
 
 // Middleware pour parser le JSON
