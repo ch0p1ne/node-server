@@ -14,6 +14,15 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization',  // En-têtes autorisés
 }));
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+  });
+
 // Middleware pour parser le JSON
 app.use(express.json())
 
@@ -33,5 +42,4 @@ app.listen(8090, () => {
 });
 
 //initialisation de la consommation des Queues
-
 setTimeout(initConsumeQueue, 2000)
