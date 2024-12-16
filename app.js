@@ -1,6 +1,6 @@
 import express from 'express'
 // fournisseur du service de routage
-import { home } from './routes/producer.js'
+import { producer } from './routes/producer.js'
 import { consumer } from './routes/consumer.js'
 import { initConsumeQueue } from './controller/initConsumer.js'
 import cors from 'cors'
@@ -19,7 +19,7 @@ app.use(express.json())
 
 
 // Route
-app.use(home)
+app.use(producer)
 app.use(consumer)
 
 // gère les route non définie
