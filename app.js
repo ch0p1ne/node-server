@@ -2,6 +2,7 @@ import express from 'express'
 // fournisseur du service de routage
 import { home } from './routes/producer.js'
 import { consumer } from './routes/consumer.js'
+import { initConsumeQueue } from './controller/initConsumer.js'
 import cors from 'cors'
 
 const app = express()
@@ -28,5 +29,9 @@ app.all( /.*/, function badRequest( req, res, next) {
 
 
 app.listen(8090, () => {
-    console.log(' [x] Serveur en cours d\'exécution sur http://localhost:8090');
+    console.log(' [ x ] Serveur en cours d\'exécution sur http://localhost:8090');
 });
+
+//initialisation de la consommation des Queues
+
+setTimeout(initConsumeQueue, 2000)

@@ -26,18 +26,18 @@ export function consumeMsg(exchange, queue) {
         if (error2) {
           throw error2;
         }
-        console.log(" [*] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+        console.log(" [ x ] Waiting for messages in %s. To exit press CTRL+C", q.queue);
         channel.bindQueue(queue, exchange, '');
 
         channel.consume(queue, function (msg) {
           if (msg.content) {
-            console.log(" \t[x] Message recuperer %s", msg.content.toString());
-            jsonMsg =  msg.content.toString()
+            console.log("\n\t [ x ] Message recuperer =>\n\t\t [ # ] %s", msg.content.toString());
+            jsonMsg = msg.content.toString()
             msgList.push(JSON.parse(jsonMsg))
-            setTimeout(function() {
-              console.log(" \t\t[x] Accuser de reception envoyer");
-              channel.ack(msg);
-            }, 3 * 1000);
+
+            console.log(" \t\t [ x ] Accuser de reception envoyer");
+            channel.ack(msg);
+
           }
         }, {
           noAck: false
@@ -45,6 +45,4 @@ export function consumeMsg(exchange, queue) {
       });
     });
   });
-
-  return jsonMsg
 }

@@ -35,7 +35,7 @@ function produceMessage(data) {
             // Envoi du message à l'échange spécifié sans clé de routage
             channel.publish(exchange, '', Buffer.from(msg));
 
-            console.log(" [x] Message envoyé: '%s'", msg);
+            console.log("\n\t [ x ] Message envoyé => \n\t\t [ # ]'%s'", msg);
         });
 
         // Fermeture de la connexion après un délai de 500ms

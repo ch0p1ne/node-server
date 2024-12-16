@@ -1,16 +1,16 @@
 import express from 'express'
-import { consumeMsg, msgList } from '../controller/rabbitmq/consumer-at-rabbit.js'
+import { queueMsg } from '../controller/initConsumer.js'
 
 var route  = express.Router()
 
 route.get("/get-notification/command", (req, res) => {
-    var jsonMsg = ''
     res.statusCode = 200
     res.setHeader("content-type", "application/json;charset=utf-8")
 
-    jsonMsg = consumeMsg('fanout_notif_command', 'admin.notification')
-    res.end(JSON.stringify(msgList), () => {
-        console.log(" \t\t[x] Les messages de la queue sont entrain d'etre consommer")
+    res.end(JSON.stringify(queueMsg), () => {
+        console.log("\n[ x ] Les messages de la queue sont entrain d'etre consommer par %s (%s) ", req.hostname , req.ip)
+        // TO DO sauvegarde des messages sur une BDD ou un autre truc
+        // queueMsg = []
     })
 })
 
