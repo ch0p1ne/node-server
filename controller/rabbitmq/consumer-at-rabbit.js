@@ -26,7 +26,7 @@ export function consumeMsg(exchange, queue) {
         if (error2) {
           throw error2;
         }
-        console.log(" [ x ] Waiting for messages in %s. To exit press CTRL+C", q.queue);
+        console.log("\n [ x ] Waiting for messages in %s. To exit press CTRL+C", q.queue);
         channel.bindQueue(queue, exchange, '');
 
         channel.consume(queue, function (msg) {

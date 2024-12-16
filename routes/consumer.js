@@ -10,7 +10,9 @@ route.get("/get-notification/command", (req, res) => {
     res.end(JSON.stringify(queueMsg), () => {
         console.log("\n[ x ] Les messages de la queue sont entrain d'etre consommer par %s (%s) ", req.hostname , req.ip)
         // TO DO sauvegarde des messages sur une BDD ou un autre truc
-        // queueMsg = []
+        
+        // Vidage de la viable lorsque la page web consumme des message
+        queueMsg.splice(0, queueMsg.length)
     })
 })
 

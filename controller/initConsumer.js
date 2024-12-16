@@ -12,4 +12,4 @@ function consumeSpecificQueue(queue) {
     // TO DO
 }
 
-export const queueMsg = msgList
+export var queueMsg = msgList
