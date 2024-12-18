@@ -1,0 +1,37 @@
+creation d'une architecture
+    creation de l'exchange de type Topic (pour une logique de distribution aux queue =  ce qu'on veux dans notre cas )
+        POUR CHAQUE ADMIN creation d'une seul queue
+        POUR CHAQUE FOURNISSEUR creation de la queue du fournisseur
+
+
+
+Context d'execution
+
+    INITIALISATION DU SERVER NODEJS
+        configuration du server 
+        creation de la connexion a rabbitMQ
+            creation du canal
+                creation de l'exchange pour les notification de commande
+                    creation de la queue admin 
+                    POUR CHAQUE fournisseur creation de sa queue
+                    SERVER EN ECOUTE DE REQUETE
+                    FIN
+    
+    COMMANDE VALIDER
+        POUR  CHAQUE produit dans la commande
+            determine le fournisseur
+            Production d'un message vers la queue admin et la queue specifique
+
+        FIN
+
+    l'ADMIN EST SUR SON TABLEAU DE BORS, (fait des requete au SERVER)
+        assertion de l'exchange
+            assertion de la queue
+                consomation continue
+                    accuser de reception
+
+    LE FOURNISSEUR EST SUR SON TABLEAU DE BORS, (fait des requete au SERVER)
+        assertion de l'exchange
+            assertion de la queue
+                consomation continue
+                    accuser de reception
