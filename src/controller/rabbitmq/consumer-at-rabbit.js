@@ -32,8 +32,8 @@ export function consumeMsg(exchange, queue) {
         channel.consume(queue, function (msg) {
           if (msg.content) {
             console.log("\n\t [ x ] Message recuperer =>\n\t\t [ # ] %s", msg.content.toString());
-            jsonMsg = msg.content.toString()
-            msgList.push(JSON.parse(jsonMsg))
+            jsonMsg = msg.content.toString();
+            msgList.push(JSON.parse(jsonMsg));
 
             console.log(" \t\t [ x ] Accuser de reception envoyer");
             channel.ack(msg);

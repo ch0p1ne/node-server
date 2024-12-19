@@ -6,15 +6,23 @@ import { initConsumeQueue } from './controller/initConsumer.js'
 import cors from 'cors'
 
 const app = express()
+const port = 8090
+
+/* 
+* creer un classe RabbitMQService
+
+* elle creer un connexion
+* Initialisation de la connexion a RabbitMQ
+ */
 
 // Configuration du middleware CORS
 app.use(cors({
     origin: 'http://localhost', // Autoriser cette origine uniquement
     methods: 'GET,POST,PUT,DELETE', // Méthodes HTTP autorisées
-    allowedHeaders: 'Content-Type,Authorization',  // En-têtes autorisés
+    allowedHeaders: 'Content-Type,Authorization, order-queue, provider-name',  // En-têtes autorisés
 }));
 
-app.use((req, res, next) => {
+/* app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.header(
       "Access-Control-Allow-Headers",
@@ -22,6 +30,8 @@ app.use((req, res, next) => {
     );
     next();
   });
+ */
+
 
 // Middleware pour parser le JSON
 app.use(express.json())
@@ -37,9 +47,8 @@ app.all( /.*/, function badRequest( req, res, next) {
 })
 
 
-app.listen(8090, () => {
-    console.log(' [ x ] Serveur en cours d\'exécution sur http://localhost:8090');
+
+app.listen(port, () => {
+    console.log(' [ x ] Serveur en cours d\'exécution sur [ %s : %s]', 'localhost', port);
 });
 
-//initialisation de la consommation des Queues
-setTimeout(initConsumeQueue, 2000)
