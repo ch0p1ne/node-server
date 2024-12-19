@@ -2,7 +2,7 @@ import express from 'express'
 // fournisseur du service de routage
 import { producer } from './routes/producer.js'
 import { consumer } from './routes/consumer.js'
-import { initConsumeQueue } from './controller/initConsumer.js'
+import RabbitMQService from './classes/RabbitMQService.js'
 import cors from 'cors'
 
 const app = express()
@@ -42,7 +42,7 @@ app.use(producer)
 app.use(consumer)
 
 // gère les route non définie
-app.all( /.*/, function badRequest( req, res, next) {
+app.all(/.*/, function badRequest(req, res, next) {
     res.status(404).send("<h2>Page introuvable</h2>")
 })
 
@@ -51,4 +51,13 @@ app.all( /.*/, function badRequest( req, res, next) {
 app.listen(port, () => {
     console.log(' [ x ] Serveur en cours d\'exécution sur [ %s : %s]', 'localhost', port);
 });
+
+// Contexte d'execution automatique Test
+(async () => {
+    var rabbitMQService = new RabbitMQService();
+    await rabbitMQService.initialize()
+    await rabbitMQService.initialize()
+})()
+
+
 
