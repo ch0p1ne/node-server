@@ -1,11 +1,11 @@
 import express from 'express'
-import produceMessage from '../controller/rabbitmq/produce-to-rabbitmq.js'
+import { rabbitMQService } from '../app.js';
 
 var route = express.Router()
 
 route.post("/", (req, res) => {
     try {
-        console.log("[#] Requette de production de message recue");
+        console.log("\n[ # ] Requette de production de message recue");
 
         if (!req.body) {
             res.statusCode = 403 // Interdit
@@ -15,14 +15,27 @@ route.post("/", (req, res) => {
 
             return
         }
-        let routingKey = req.header('order_queue')
-        produceMessage(req.body, routingKey)
+        let routingKey = '';
+        let suffixKey = '.order';
+
+        rabbitMQService.assertChannel('producer')
+        for (var currentProduct in req.body) {
+            routingKey = req.body[currentProduct].product_provider.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
+            routingKey = routingKey.replaceAll(' ', '-'); 
+            
+            
+            rabbitMQService.publish(req.body[currentProduct], routingKey) // pour chaque produit nous produissant une notif
+        }
+
+
+
+
         res.statusCode = 200 // ok
         res.setHeader('content-type', "text/html")
         res.end("Les donnée ont ete envoyer")
 
     } catch (error) {
-        console.error(" [ -- ] Erreur lors de l'emmission de la commande");
+        console.error(" [ -- ] Erreur lors de la notification de la commande %s", error);
 
     }
 })

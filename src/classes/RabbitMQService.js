@@ -67,6 +67,13 @@ export default class RabbitMQService {
     async assertChannel(consumerName) {
         try {
 
+            if(consumerName === 'producer') {
+                this.activeChannel = this.producerChannel
+                console.log("\n [ !! ] Utilisation du chanel du Producer");
+
+                return false;
+                
+            }
             // determine si un canal est deja creer pour ce consommateur
             if (this.consummerChannels[consumerName]) {
                 this.activeChannel = this.consummerChannels[consumerName];
@@ -86,7 +93,7 @@ export default class RabbitMQService {
             console.error(" [ -- ] Erreur lors de la creation du channel : %s", error);
 
         }
-        
+
     }
 
     /**
@@ -102,12 +109,12 @@ export default class RabbitMQService {
                 routingKey = '#.order.#'
             }
             await this.activeChannel.bindQueue(queueName, exchange, routingKey);
-            console.log(" [ ++ ] Bindage de la queue %s réussi avec la routingKey %s",  this.activeQueue.queueName, routingKey);
-            
+            console.log(" [ ++ ] Bindage de la queue %s réussi avec la routingKey %s", this.activeQueue.queueName, routingKey);
+
 
         } catch (error) {
             console.error(" [ -- ] Erreur lors du Binding de %s a l'echange order_notificate_topic %s", this.activeQueue.queueName, error);
-            
+
         }
     }
 
@@ -142,19 +149,41 @@ export default class RabbitMQService {
             channel.consume(queueName, async (msg) => {
                 if (msg.content) {
                     console.log("\n\t [ ++ ] Message consummer sur la queue %s par le server => ...", queueName);
-                    
-                    this.messageAwait[queueName].push(JSON.stringify(msg.content.toString()));
+
+                    this.messageAwait[queueName].push(JSON.parse(msg.content.toString()));
 
                     await channel.ack(msg);
                     console.log("\t\t [ ++ ] Accuser de reception envoyer");
                 }
             },
-            { noAck: false }
+                { noAck: false }
             )
         } catch (error) {
             console.error(" [ -- ] Erreur lors de la consommation de la queue %s", this.activeQueue.queueName);
 
         }
+    }
+
+    /**
+     * Publie un message sur l'exchange spécifier
+     * @param {*} data 
+     * @param {string} routingKey 
+     * @param {string} exchange 
+     */
+    async publish(data, routingKey = 'admin.#', exchange = 'order_notification_topic') {
+        try {
+            // Conversion des données en chaîne JSON
+            const msg = JSON.stringify(data);
+
+            // Envoi du message à l'échange spécifié avec clé de routage
+            await this.activeChannel.publish(exchange, routingKey, Buffer.from(msg));
+
+            console.log("\n\t [ x ] Message envoyé vers %s:%s => \n\t\t [ # ]'%s'", exchange, routingKey, msg);
+        } catch (error) {
+            console.error(" [ -- ] Erreur de publication des donnée vers l'echange , %s", error);
+
+        }
+
     }
 
     /**

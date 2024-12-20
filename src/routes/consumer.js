@@ -5,47 +5,45 @@ var route = express.Router()
 
 route.get("/get-notification/command", async (req, res) => {
     try {
-        console.log("\n [#] Requette de consomation recus");
+        console.log("\n[ _-_-_-_- ] Requette de consomation recus");
 
-        const order_queue = req.header('order-queue');
+        const order_queue = req.body;
         const exchange_name = "order_notification_topic";
         const consumer_name = req.header('provider-name');
         var reponseOrder = [];
         var numberOfMsg = 0;
         res.statusCode = 200;
         res.setHeader("content-type", "application/json;charset=utf-8");
-
-        if (req.header("consume-status") == "begin" || req.header("consume-status") == null) {
-            if(await rabbitMQService.assertChannel(consumer_name)) {
-                await rabbitMQService.assertQueue(order_queue);
-                await rabbitMQService.bindQueue();
-            }
-            rabbitMQService.consumeMsg();
-            numberOfMsg = rabbitMQService.messageAwait[order_queue].length;
-            console.log(" [ ++ ] nombre de message de la queue %s recuperer : %s", order_queue , numberOfMsg);
-            for (let i = 0; i < numberOfMsg; i++) {
-                
-                reponseOrder.push(rabbitMQService.messageAwait[order_queue][0])
-                rabbitMQService.messageAwait[order_queue].shift();
-            }
-
-            console.log(JSON.stringify(reponseOrder));
-            
-            res.end(JSON.stringify(reponseOrder), () => {
-                console.log("\n [ # ] Réponse envoyée\n\n_-_-_-_-_-_-_-_-Cette requette a été entierement Traitement et terminer_-_-_-_-_-_-_-_-_");
-            });
-
-
-
-            /* EXEMPLE d'une classe consumer
-            new consumerService(chanel)
-            consumerService.assertQueue()
-            consumerService.consume()
-            consumerService.getNewMsg()
-        
-            consumerList[chanel].push
-             */
+        if (await rabbitMQService.assertChannel(consumer_name)) {
+            await rabbitMQService.assertQueue(order_queue);
+            await rabbitMQService.bindQueue();
         }
+        rabbitMQService.consumeMsg();
+        numberOfMsg = rabbitMQService.messageAwait[order_queue].length;
+        console.log(" [ ++ ] nombre de message de la queue %s recuperer : %s", order_queue, numberOfMsg);
+        for (let i = 0; i < numberOfMsg; i++) {
+
+            reponseOrder.push(rabbitMQService.messageAwait[order_queue][0])
+            rabbitMQService.messageAwait[order_queue].shift();
+        }
+
+        console.log(JSON.stringify(reponseOrder));
+
+        res.end(JSON.stringify(reponseOrder), () => {
+            console.log("\n[ _-_-_-_- ] Réponse envoyée");
+        });
+
+
+
+        /* EXEMPLE d'une classe consumer
+        new consumerService(chanel)
+        consumerService.assertQueue()
+        consumerService.consume()
+        consumerService.getNewMsg()
+    
+        consumerList[chanel].push
+         */
+    
 
         /* if (req.header("consume-status") == "consume" || req.header("consume-status") == null) {
             res.end(JSON.stringify(queueMsgTable), () => {
@@ -60,9 +58,9 @@ route.get("/get-notification/command", async (req, res) => {
 
 
     } catch (error) {
-        console.error(" [ -- ] Erreur pendant le traitement de la requette de consommation : %s", error);
+    console.error(" [ -- ] Erreur pendant le traitement de la requette de consommation : %s", error);
 
-    }
+}
 
 })
 
