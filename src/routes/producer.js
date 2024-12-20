@@ -1,23 +1,30 @@
 import express from 'express'
 import produceMessage from '../controller/rabbitmq/produce-to-rabbitmq.js'
-import { msgIsEmpty } from '../controller/msgController.js'
 
 var route = express.Router()
 
 route.post("/", (req, res) => {
-    if (msgIsEmpty(req.body)) {
-        res.statusCode = 403 // Interdit
+    try {
+        console.log("[#] Requette de production de message recue");
+
+        if (!req.body) {
+            res.statusCode = 403 // Interdit
+            res.setHeader('content-type', "text/html")
+            res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>")
+            console.log("Il n'y pas de commande, la commande doit contenir des article")
+
+            return
+        }
+        let routingKey = req.header('order_queue')
+        produceMessage(req.body, routingKey)
+        res.statusCode = 200 // ok
         res.setHeader('content-type', "text/html")
-        res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>")
-        console.log("Il n'y pas de commande, la commande doit contenir des article")
+        res.end("Les donnée ont ete envoyer")
 
-        return
+    } catch (error) {
+        console.error(" [ -- ] Erreur lors de l'emmission de la commande");
+
     }
-    produceMessage(req.body)
-    res.statusCode = 200 // ok
-    res.setHeader('content-type', "text/html")
-    res.end("Les donnée ont ete envoyer")
-
 })
 
 route.get("/", (req, res) => {

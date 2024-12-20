@@ -2,7 +2,7 @@ import amqplib from 'amqplib/callback_api.js'
 
 
 
-const queueNeeded = 'admin.notification'
+const queueNeeded = 'admin.order'
 const  exchangeUsed = 'notification'
 const routingKey = '#.order.#'
 

@@ -3,7 +3,7 @@
 // Importation de la bibliothèque amqplib pour utiliser RabbitMQ
 import amqplib from 'amqplib/callback_api.js'
 
-function produceMessage(data) {
+function produceMessage(data, routingKey) {
 
     // Connexion au serveur RabbitMQ à l'adresse 'amqp://localhost'
     amqplib.connect('amqp://localhost', (error0, connection) => {
@@ -24,16 +24,16 @@ function produceMessage(data) {
             }
 
             // Définition du nom de l'échange RabbitMQ
-            const exchange = 'fanout_notif_command';
+            const exchange = 'order_notification_topic';
             
             // Conversion des données en chaîne JSON
             const msg = JSON.stringify(data);
 
             // Assertion de l'échange avec le type 'fanout' (diffusion aux abonnés)
-            channel.assertExchange(exchange, 'fanout', { durable: true });
+            // channel.assertExchange(exchange, 'topic', { durable: true });
 
             // Envoi du message à l'échange spécifié sans clé de routage
-            channel.publish(exchange, '', Buffer.from(msg));
+            channel.publish(exchange, routingKey, Buffer.from(msg));
 
             console.log("\n\t [ x ] Message envoyé => \n\t\t [ # ]'%s'", msg);
         });
