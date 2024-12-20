@@ -42,7 +42,8 @@ const setupRbtmq = new SetupRbtmqServices();
 
 
     app.listen(port, () => {
-        console.log(' [ ~~ ] Fin du Setup\n\t Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port);
+        setTimeout(() => console.log(' [ ~~ ] Fin du Setup\n\t Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port)
+        , 7500);
     });
 
 })()

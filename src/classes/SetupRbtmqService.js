@@ -29,7 +29,7 @@ export default class SetupRbtmqServices {
             
             // Fermeture de cette connexion apres un delay
             console.log("    [ >+ setup queue ] Setup des queue terminer.");       
-            setTimeout( () => this.rabbitMQService.close(), 7300);      
+            setTimeout( () => this.rabbitMQService.close(), 7100);      
             
         } catch (error) {
             console.log(" [ -- ] Erreur SETUP; pendant la population des queues %s", error);
