@@ -5,7 +5,7 @@ var route = express.Router()
 
 route.post("/", (req, res) => {
     try {
-        console.log("\n[ # ] Requette de production de message recue");
+        console.log("\n[ _-_-_-_- ] Requette de production de message recue");
 
         if (!req.body) {
             res.statusCode = 403 // Interdit
@@ -34,7 +34,9 @@ route.post("/", (req, res) => {
 
         res.statusCode = 200 // ok
         res.setHeader('content-type', "text/html")
-        res.end("Les donnée ont ete envoyer")
+        res.end("Les donnée ont ete envoyer", () => {
+            console.log("\n[ _-_- ] Réponse envoyée");
+        })
 
     } catch (error) {
         console.error(" [ -- ] Erreur lors de la notification de la commande %s", error);

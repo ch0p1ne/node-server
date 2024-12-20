@@ -5,7 +5,7 @@ var route = express.Router()
 
 route.get("/get-notification/command", async (req, res) => {
     try {
-        console.log("\n[ _-_-_-_- ] Requette de consomation recus");
+        console.log("\n[ _-_-_-_- ] Requette de consommation recus");
 
         const order_queue = req.body;
         const exchange_name = "order_notification_topic";
@@ -30,7 +30,7 @@ route.get("/get-notification/command", async (req, res) => {
         console.log(JSON.stringify(reponseOrder));
 
         res.end(JSON.stringify(reponseOrder), () => {
-            console.log("\n[ _-_-_-_- ] Réponse envoyée");
+            console.log("\n[ _-_- ] Réponse envoyée");
         });
 
 
@@ -44,18 +44,10 @@ route.get("/get-notification/command", async (req, res) => {
         consumerList[chanel].push
          */
     
-
-        /* if (req.header("consume-status") == "consume" || req.header("consume-status") == null) {
-            res.end(JSON.stringify(queueMsgTable), () => {
-                const fullUrl = req.protocol + '://' + req.get('host');
-                console.log("\n[ x ] Les messages de la queue [ %s ] sont entrain d'etre consommer par  [ %s(F: %s) ]", req.header('order-queue'), fullUrl, req.header('provider-name'));
                 // TO DO sauvegarde des messages sur une BDD ou un autre truc
 
                 // Vidage de la du tableau lorsque la page web consumme des messages
-                queueMsgTable.splice(0, queueMsgTable.length);
-            })
-        } */
-
+                // queueMsgTable.splice(0, queueMsgTable.length);
 
     } catch (error) {
     console.error(" [ -- ] Erreur pendant le traitement de la requette de consommation : %s", error);
