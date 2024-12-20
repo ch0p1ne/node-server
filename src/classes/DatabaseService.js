@@ -37,7 +37,7 @@ export default class DatabaseService {
                 database: this.database,
             });
             this.activeConnection = connection;
-            console.log(" [ ++ ] Connexion a la base de donnée établie");
+            console.log("\n [ ++ ] Connexion a la base de donnée établie");
 
         } catch (error) {
             console.error(" [ -- ] Erreur lors de la creation de la connexion avec la base de donne : %s", error);
@@ -76,7 +76,3 @@ export default class DatabaseService {
 
 }
 
-const bddconnect = new DatabaseService();
-await bddconnect.initConnection();
-await bddconnect.preparedStatement('select * from rubrique where name = ?', ['INFORMATIQUE'])
-console.log(bddconnect.results)

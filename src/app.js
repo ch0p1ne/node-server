@@ -1,17 +1,23 @@
 import express from 'express'
 import RabbitMQService from './classes/RabbitMQService.js'
+import SetupRbtmqServices from './classes/SetupRbtmqService.js'
 import { producer } from './routes/producer.js'
 import { consumer } from './routes/consumer.js'
 import cors from 'cors'
 
 const app = express()
 const port = 8090
-var rabbitMQService = new RabbitMQService();
+const rabbitMQService = new RabbitMQService();
+const setupRbtmq = new SetupRbtmqServices();
 
 (async () => {
     console.log("[X] Serveur en cours de demarage...");
     
-    await rabbitMQService.initialize()
+    // Setup
+    console.log("[ ~~ ] Setup du server");
+    
+    await setupRbtmq.populizeRabbitQueue();
+    await rabbitMQService.initialize();
 
     // Configuration du middleware CORS
     app.use(cors({

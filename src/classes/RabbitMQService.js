@@ -14,8 +14,8 @@ export default class RabbitMQService {
     activeChannel = null;
     activeQueue = {};
     messageAwait = [];
-    exchanges = [];
     activeExchange = null;
+    exchanges = [];
 
 
     constructor() {
@@ -27,8 +27,8 @@ export default class RabbitMQService {
         this.activeChannel = null;
         this.activeQueue = { queueName: '', queue: null };
         this.messageAwait = [];
-        this.exchanges = [];
-        this.activeExchange = null;
+        this.activeExchange = 'order_notification_topic';
+        this.exchanges.push(this.activeChannel);
 
     }
 
@@ -45,13 +45,21 @@ export default class RabbitMQService {
                 throw new Error("Une connexion est deja en cours, impossible d'en creer une nouvelle pour le moment");
             }
             this.connection = await amqp.connect(url);
+            console.log("\n [ >+ ] Connexion établie");
+            
             this.producerChannel = await this.connection.createChannel();
+            console.log("    [ ++ ] Chanel de production de message crée");
             this.activeChannel = this.producerChannel
 
 
+            await this.producerChannel.assertExchange(this.activeExchange, 'topic', { durable : true});
+            console.log("    [ ++ ] L'exchange est crée");
+
             await this.producerChannel.assertQueue('admin.order', { durable: true });
-            await this.producerChannel.bindQueue('admin.order', 'order_notification_topic', "#.order.#")
-            console.log(" [ ++ ] Connexion et canal de production de message crée");
+            console.log("    [ ++ ] Queue de l'admin crée");
+            await this.producerChannel.bindQueue('admin.order', this.activeExchange, "#.order.#")
+            console.log("    [ ++ ] Binding de la queue %s a l'exchange %s crée", 'admin.order', this.activeExchange);
+            console.log(" [ >+ ] Tous est ok");
 
         } catch (error) {
             console.error('\n [ -- ] Erreur de connection RabbitMQ : %s', error)

@@ -16,7 +16,7 @@ export default class SetupRbtmqServices {
     async populizeRabbitQueue () {
         try {
             await this.rabbitMQService.initialize();
-            console.log(this.rabbitMQService);
+            await this.connection.initConnection();
             
         } catch (error) {
             console.log(" [ -- ] Erreur pendant la population des queues %s", error);
