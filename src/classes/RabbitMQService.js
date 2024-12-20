@@ -16,9 +16,10 @@ export default class RabbitMQService {
     messageAwait = [];
     activeExchange = null;
     exchanges = [];
+    invoquer = ''
 
 
-    constructor() {
+    constructor(invoquer) {
         this.connection = null;
         this.producerChannel = null;
         this.consummerChannels = [];
@@ -29,6 +30,7 @@ export default class RabbitMQService {
         this.messageAwait = [];
         this.activeExchange = 'order_notification_topic';
         this.exchanges.push(this.activeChannel);
+        this.invoquer = invoquer;
 
     }
 
@@ -45,7 +47,7 @@ export default class RabbitMQService {
                 throw new Error("Une connexion est deja en cours, impossible d'en creer une nouvelle pour le moment");
             }
             this.connection = await amqp.connect(url);
-            console.log("\n [ >+ ] Connexion à RabbitMQ établie");
+            console.log("\n [ >+ %s ] Connexion à RabbitMQ établie ", this.invoquer);
             
             this.producerChannel = await this.connection.createChannel();
             console.log("    [ ++ ] Chanel de production de message crée");
@@ -117,7 +119,7 @@ export default class RabbitMQService {
                 routingKey = '#.order.#'
             }
             await this.activeChannel.bindQueue(queueName, exchange, routingKey);
-            console.log(" [ ++ ] Bindage de la queue %s réussi avec la routingKey %s", this.activeQueue.queueName, routingKey);
+            console.log("\t [ ++ ] Bindage de la queue %s réussi avec la routingKey %s", this.activeQueue.queueName, routingKey);
 
 
         } catch (error) {
@@ -137,7 +139,7 @@ export default class RabbitMQService {
             this.activeQueue.queueName = queueName
             this.activeQueue.queue = await channel.assertQueue(queueName, { durable: true, exclusive: false })
             this.messageAwait[queueName] = [];
-            console.log(" [ ++ ] Queue crée avec succes");
+            console.log("\t [ ++ ] Queue crée avec succes");
 
         } catch (error) {
             console.error(" [ -- ] Erreur lors de la creation de la queue %s", error);
@@ -207,18 +209,17 @@ export default class RabbitMQService {
                 console.log("\t\t [ ++ ] Canal supprimer pour : %s", consumerName);
             }
             await this.producerChannel.close()
-            console.log("\t\t [ ++ ] Canal supprimer pour : %s", consumerName);
 
             // Verification d'une connexion puis fermuture de la connexion
             if (!this.connection)
                 throw new Error("Vous ne pouvez fermer une connexion qui n'existe pas, Initialiser d'abords le servive avec init()");
             await this.connection.close()
-            console.log(" [ ++ }Connexion et channels correctement fermé");
+            console.log(" [ >+ %s ] Connexion et channels correctement fermé", this.invoquer);
 
 
         } catch (error) {
             console.error(" [ -- ] Erreur lors de la fermeture : %s", error);
-
+            await this.connection.close()
         }
     }
 }

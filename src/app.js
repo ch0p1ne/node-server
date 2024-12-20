@@ -7,15 +7,15 @@ import cors from 'cors'
 
 const app = express()
 const port = 8090
-const rabbitMQService = new RabbitMQService();
+const rabbitMQService = new RabbitMQService('main service');
 const setupRbtmq = new SetupRbtmqServices();
 
 (async () => {
     console.log("[X] Serveur en cours de demarage...");
-    
+
     // Setup
     console.log("[ ~~ ] Setup du server");
-    
+
     await setupRbtmq.populizeRabbitQueue();
     await rabbitMQService.initialize();
 
@@ -42,7 +42,7 @@ const setupRbtmq = new SetupRbtmqServices();
 
 
     app.listen(port, () => {
-        console.log(' [ XXX ] Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port);
+        console.log(' [ ~~ ] Fin du Setup\n\t Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port);
     });
 
 })()

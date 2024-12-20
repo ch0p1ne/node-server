@@ -12,16 +12,18 @@ export default class DatabaseService {
     // ! j'ai pas mis ces truc dans le contructeur, un bug arrivera ?
     #results = [];
     #fields = [];
+    invoquer = null;
 
     #history = [];
     #currentsqlQuery = [];
 
-    constructor(host = 'localhost', user = 'root', password = '', database = 'sensei5y_senshop_ps') {
+    constructor(invoquer, host = 'localhost', user = 'root', password = '', database = 'sensei5y_senshop_ps') {
         this.host = host;
         this.user = user;
         this.password = password;
         this.database = database;
         this.activeConnection = null;
+        this.invoquer = invoquer;
     }
 
     /**
@@ -37,10 +39,10 @@ export default class DatabaseService {
                 database: this.database,
             });
             this.activeConnection = connection;
-            console.log("\n [ ++ ] Connexion a la base de donnée établie");
+            console.log("\n    [ >+ %s ] Connexion a la base de donnée établie", this.invoquer);
 
         } catch (error) {
-            console.error(" [ -- ] Erreur lors de la creation de la connexion avec la base de donne : %s", error);
+            console.error("    [ -- ] Erreur lors de la creation de la connexion avec la base de donne : %s", error);
         }
 
     }
@@ -53,12 +55,12 @@ export default class DatabaseService {
     async preparedStatement(sql = '', param = []) {
         try {
             if(!this.activeConnection)
-                throw new Error("Une connexion est necessaire avant d'executer une requete");
+                throw new Error(" [ -- ] Une connexion est necessaire avant d'executer une requete");
             const [results, fields] = await this.activeConnection.execute(sql,param);
 
             this.results = results;
             this.fields = fields;
-            console.log(" [ ++ ] Requette preparer executer");
+            console.log("    [ >+ ] Requette preparer executer");
 
         } catch (error) {
             console.error(" [ -- ] Erreur de pendant la requete preparer : %s", error);
