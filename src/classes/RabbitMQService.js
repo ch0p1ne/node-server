@@ -45,7 +45,7 @@ export default class RabbitMQService {
                 throw new Error("Une connexion est deja en cours, impossible d'en creer une nouvelle pour le moment");
             }
             this.connection = await amqp.connect(url);
-            console.log("\n [ >+ ] Connexion établie");
+            console.log("\n [ >+ ] Connexion à RabbitMQ établie");
             
             this.producerChannel = await this.connection.createChannel();
             console.log("    [ ++ ] Chanel de production de message crée");
@@ -111,7 +111,7 @@ export default class RabbitMQService {
      * @param {string} routingKey 
      * @param {boolean} admin 
      */
-    async bindQueue(queueName = this.activeQueue.queueName, exchange = 'order_notification_topic', routingKey = queueName, admin = false) {
+    async bindQueue(queueName = this.activeQueue.queueName, routingKey = queueName, exchange = this.activeExchange, admin = false) {
         try {
             if (admin) {
                 routingKey = '#.order.#'
@@ -135,7 +135,7 @@ export default class RabbitMQService {
     async assertQueue(queueName, channel = this.activeChannel) {
         try {
             this.activeQueue.queueName = queueName
-            this.activeQueue.queue = await channel.assertQueue(queueName, { durable: true, exclusive: true })
+            this.activeQueue.queue = await channel.assertQueue(queueName, { durable: true, exclusive: false })
             this.messageAwait[queueName] = [];
             console.log(" [ ++ ] Queue crée avec succes");
 

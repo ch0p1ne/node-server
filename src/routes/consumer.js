@@ -7,9 +7,9 @@ route.get("/get-notification/command", async (req, res) => {
     try {
         console.log("\n[ _-_-_-_- ] Requette de consommation recus");
 
-        const order_queue = req.body;
-        const exchange_name = "order_notification_topic";
-        const consumer_name = req.header('provider-name');
+        const order_queue = req.header('Order-queue') // req.body;
+        const exchange_name = rabbitMQService.activeExchange;
+        const consumer_name = req.header('Provider-name');
         var reponseOrder = [];
         var numberOfMsg = 0;
         res.statusCode = 200;
