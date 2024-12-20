@@ -18,12 +18,14 @@ route.post("/", (req, res) => {
         let routingKey = '';
         let suffixKey = '.order';
 
+
+        /* Utilise le chanel Production de message qui est initialiser en même temps
+        que la connexion */
         rabbitMQService.assertChannel('producer')
+
         for (var currentProduct in req.body) {
             routingKey = req.body[currentProduct].product_provider.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
             routingKey = routingKey.replaceAll(' ', '-'); 
-            
-            
             rabbitMQService.publish(req.body[currentProduct], routingKey) // pour chaque produit nous produissant une notif
         }
 
