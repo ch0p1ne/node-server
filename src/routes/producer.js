@@ -5,7 +5,7 @@ var route = express.Router()
 
 route.post("/", (req, res) => {
     try {
-        console.log("\n[ _-_-_-_- ] Requette de production de message recue");
+        console.log("\n[ _-_-_-_- ] Requette de pro msg recue");
 
         if (!req.body) {
             res.statusCode = 403 // Interdit

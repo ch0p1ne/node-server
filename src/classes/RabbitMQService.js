@@ -95,7 +95,7 @@ export default class RabbitMQService {
             let channel = await this.connection.createChannel();
             this.consummerChannels[consumerName] = channel;
             this.activeChannel = channel;
-            console.log(" [ ++ ] Canal crée pour le consommateur : ");
+            console.log(" [ ++ ] Canal crée pour le consommateur : %s", consumerName);
 
             return channel | true
 
@@ -113,7 +113,7 @@ export default class RabbitMQService {
      * @param {string} routingKey 
      * @param {boolean} admin 
      */
-    async bindQueue(queueName = this.activeQueue.queueName, routingKey = queueName, exchange = this.activeExchange, admin = false) {
+    async bindQueue(queueName = this.activeQueue.queueName, routingKey = this.activeQueue.queueName, exchange = this.activeExchange, admin = false) {
         try {
             if (admin) {
                 routingKey = '#.order.#'
@@ -123,7 +123,7 @@ export default class RabbitMQService {
 
 
         } catch (error) {
-            console.error(" [ -- ] Erreur lors du Binding de %s a l'echange order_notificate_topic %s", this.activeQueue.queueName, error);
+            console.error(" [ -- ] Erreur lors du Binding de %s a l'echange %s %s", this.activeQueue.queueName, this.activeExchange , error);
 
         }
     }
@@ -175,12 +175,12 @@ export default class RabbitMQService {
     }
 
     /**
-     * Publie un message sur l'exchange spécifier
+     * Convertie en JSON puis Publie un message sur l'exchange par defaut ou specifié
      * @param {*} data 
      * @param {string} routingKey 
      * @param {string} exchange 
      */
-    async publish(data, routingKey = 'admin.#', exchange = 'order_notification_topic') {
+    async publish(data, routingKey = 'admin.#', exchange = this.activeExchange) {
         try {
             // Conversion des données en chaîne JSON
             const msg = JSON.stringify(data);

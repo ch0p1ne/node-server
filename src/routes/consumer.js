@@ -5,9 +5,9 @@ var route = express.Router()
 
 route.get("/get-notification/command", async (req, res) => {
     try {
-        console.log("\n[ _-_-_-_- ] Requette de consommation recus");
+        console.log("\n[ _-_-_-_- ] Requete de consommation recus");
 
-        const order_queue = req.header('Order-queue') // req.body;
+        const queue = req.header('Order-queue') // req.body;
         const exchange_name = rabbitMQService.activeExchange;
         const consumer_name = req.header('Provider-name');
         var reponseOrder = [];
@@ -15,16 +15,16 @@ route.get("/get-notification/command", async (req, res) => {
         res.statusCode = 200;
         res.setHeader("content-type", "application/json;charset=utf-8");
         if (await rabbitMQService.assertChannel(consumer_name)) {
-            await rabbitMQService.assertQueue(order_queue);
-            await rabbitMQService.bindQueue();
+            await rabbitMQService.assertQueue(queue);
+            await rabbitMQService.bindQueue(queue, queue+'.#', exchange_name);
         }
         rabbitMQService.consumeMsg();
-        numberOfMsg = rabbitMQService.messageAwait[order_queue].length;
-        console.log(" [ ++ ] nombre de message de la queue %s recuperer : %s", order_queue, numberOfMsg);
+        numberOfMsg = rabbitMQService.messageAwait[queue].length;
+        console.log(" [ ++ ] Message sur la queue %s recuperer : %s", queue, numberOfMsg);
         for (let i = 0; i < numberOfMsg; i++) {
 
-            reponseOrder.push(rabbitMQService.messageAwait[order_queue][0])
-            rabbitMQService.messageAwait[order_queue].shift();
+            reponseOrder.push(rabbitMQService.messageAwait[queue][0])
+            rabbitMQService.messageAwait[queue].shift();
         }
 
         console.log(JSON.stringify(reponseOrder));
