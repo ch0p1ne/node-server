@@ -8,7 +8,7 @@ import cors from 'cors'
 const app = express()
 const port = 8090
 const rabbitMQService = new RabbitMQService('main service');
-const setupRbtmq = new SetupRbtmqServices();
+export const setupRbtmq = new SetupRbtmqServices();
 
 (async () => {
     console.log("[X] Serveur en cours de demarage...");

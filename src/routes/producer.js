@@ -1,35 +1,45 @@
 import express from 'express'
 import { rabbitMQService } from '../app.js';
+import { setupRbtmq } from '../app.js';
 
-var route = express.Router()
+var route = express.Router();
 
 route.post("/", (req, res) => {
     try {
         console.log("\n[ _-_-_-_- ] Requette de pro msg recue");
 
         if (!req.body) {
-            res.statusCode = 403 // Interdit
-            res.setHeader('content-type', "text/html")
-            res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>")
-            console.log("Il n'y pas de commande, la commande doit contenir des article")
+            res.statusCode = 403; // Interdit
+            res.setHeader('content-type', "text/html");
+            res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>");
+            console.log("Il n'y pas de commande, la commande doit contenir des article");
 
             return
         }
-        let routingKey = '';
-        let suffixKey = '.order';
+
 
 
         /* Utilise le chanel Production de message qui est initialiser en même temps
         que la connexion */
-        rabbitMQService.assertChannel('producer')
+        rabbitMQService.assertChannel('producer');
+
 
         for (var currentProduct in req.body) {
-            routingKey = req.body[currentProduct].product_provider.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
-            routingKey = routingKey.replaceAll(' ', '-'); 
-            rabbitMQService.publish(req.body[currentProduct], routingKey) // pour chaque produit nous produissant une notif
+            let routingKey = '';
+            let suffixKey = '.order';
+
+            // Récupération du nom des fourssiseur via leur id (un produit en à obligatoirement 1 )
+            setupRbtmq.getProviderNameById(req.body[currentProduct].provider_id)
+
+                .then((providers_info) => {
+                    let provider_name = providers_info[0].provider_name
+                    routingKey = provider_name.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
+                    routingKey = routingKey.replaceAll(' ', '-');
+                    rabbitMQService.publish(req.body[currentProduct], routingKey);
+                })
         }
 
-
+        // pour chaque produit nous produissant une notif
 
 
         res.statusCode = 200 // ok
@@ -55,3 +65,6 @@ route.get("/", (req, res) => {
 })
 
 export const producer = route
+
+
+

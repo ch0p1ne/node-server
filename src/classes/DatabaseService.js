@@ -10,8 +10,8 @@ export default class DatabaseService {
     #database = null;
     #activeConnection = null;
     // ! j'ai pas mis ces truc dans le contructeur, un bug arrivera ?
-    #results = [];
-    #fields = [];
+    results = [];
+    fields = [];
     invoquer = null;
 
     #history = [];
@@ -54,13 +54,16 @@ export default class DatabaseService {
      */
     async preparedStatement(sql = '', param = []) {
         try {
-            if(!this.activeConnection)
+            if (!this.activeConnection)
                 throw new Error(" [ -- ] Une connexion est necessaire avant d'executer une requete");
-            const [results, fields] = await this.activeConnection.execute(sql,param);
+            const [results, fields] = await this.activeConnection.execute(sql, param);
 
             this.results = results;
             this.fields = fields;
+            let data = []
             console.log("    [ >+ ] Requette preparer executer");
+
+            return [results, fields]
 
         } catch (error) {
             console.error(" [ -- ] Erreur de pendant la requete preparer : %s", error);
@@ -68,12 +71,26 @@ export default class DatabaseService {
         }
     }
 
+    /**
+     * Retourne la list des elements renvoyer par la requete préparer
+     * @returns []
+     */
     getResulsFetch() {
         return this.results;
     }
 
     getFieldsFetch() {
         return this.fields;
+    }
+
+    close() {
+        try {
+            this.activeConnection.close()
+
+        } catch (error) {
+            console.error(" [ -- ] Erreur lors de la fermeture de la connexion %s", error);
+
+        }
     }
 
 }

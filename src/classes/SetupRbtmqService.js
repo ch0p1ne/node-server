@@ -12,7 +12,7 @@ export default class SetupRbtmqServices {
     #sqlQuery1 = ''
 
     constructor() {
-        this.connection = new DatabaseService('setup queue');
+        this.connection = new DatabaseService('setup queue', 'localhost', 'root', 'password*#21');
         this.rabbitMQService = new RabbitMQService('setup queue');
         this.queueNameList = [];
         this.sqlQuery1 = 'SELECT provider_name from providers'
@@ -46,5 +46,12 @@ export default class SetupRbtmqServices {
             await this.rabbitMQService.assertQueue(completQueueName)
             await this.rabbitMQService.bindQueue(completQueueName, routingkey)
         });
+    }
+
+    async getProviderNameById(id) {
+        let sqlStatement = 'SELECT provider_name FROM providers JOIN product_shop ON id_provider = provider_id where provider_id = ? limit 1 ';
+        await this.connection.preparedStatement(sqlStatement, [ id ]);
+        
+        return this.connection.getResulsFetch();
     }
 }
