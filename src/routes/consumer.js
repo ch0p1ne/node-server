@@ -18,20 +18,22 @@ route.get("/get-notification/command", async (req, res) => {
             await rabbitMQService.assertQueue(queue);
             await rabbitMQService.bindQueue(queue, queue+'.#', exchange_name);
         }
-        rabbitMQService.consumeMsg();
-        numberOfMsg = rabbitMQService.messageAwait[queue].length;
-        console.log(" [ ++ ] Message sur la queue %s recuperer : %s", queue, numberOfMsg);
-        for (let i = 0; i < numberOfMsg; i++) {
-
-            reponseOrder.push(rabbitMQService.messageAwait[queue][0])
-            rabbitMQService.messageAwait[queue].shift();
-        }
-
-        console.log(JSON.stringify(reponseOrder));
-
-        res.end(JSON.stringify(reponseOrder), () => {
-            console.log("\n[ _-_- ] Réponse envoyée");
-        });
+        rabbitMQService.consumeMsg()
+            .then((resolve) => {
+                numberOfMsg = rabbitMQService.messageAwait[queue].length;
+                console.log(" [ ++ ] Message sur la queue %s recuperer : %d", queue, numberOfMsg);
+                for (let i = 0; i < numberOfMsg; i++) {
+        
+                    reponseOrder.push(rabbitMQService.messageAwait[queue][0])
+                    rabbitMQService.messageAwait[queue].shift();
+                }
+        
+                console.log(JSON.stringify(reponseOrder));
+        
+                res.end(JSON.stringify(reponseOrder), () => {
+                    console.log("\n[ _-_- ] Réponse envoyée");
+                });
+            })
 
 
 
