@@ -7,7 +7,7 @@ route.get("/get-notification/command", async (req, res) => {
     try {
         console.log("\n[ _-_-_-_- ] Requete de consommation recus");
 
-        var queue = req.header('Order-queue') // req.body;
+        const queue = req.header('Order-queue') // req.body;
         if(queue == 'admin'){
             queue = 'admin.order';
         }
@@ -21,23 +21,30 @@ route.get("/get-notification/command", async (req, res) => {
             await rabbitMQService.assertQueue(queue);
             await rabbitMQService.bindQueue(queue, queue, exchange_name);
         }
-        await rabbitMQService.consumeMsg();
-        numberOfMsg = rabbitMQService.messageAwait[queue].length;
-        console.log(" [ ++ ] Messages sur la queue %s recuperer : %d", queue, numberOfMsg);
-
-        reponseOrder = rabbitMQService.messageAwait[queue].splice(0, numberOfMsg);
-
-        console.log(JSON.stringify(reponseOrder));
-
-        res.json(reponseOrder);
-        console.log("\n[ _-_- ] Réponse envoyée");
-
-        // ...existing code...
+        rabbitMQService.consumeMsg()
+            .then((resolve) => {
+                numberOfMsg = rabbitMQService.messageAwait[queue].length;
+                console.log(" [ ++ ] Message sur la queue %s recuperer : %d", queue, numberOfMsg);
+                for (let i = 0; i < numberOfMsg; i++) {
+        
+                    reponseOrder.push(rabbitMQService.messageAwait[queue][0])
+                    rabbitMQService.messageAwait[queue].shift();
+                }
+        
+                console.log(JSON.stringify(reponseOrder));
+        
+                res.end(JSON.stringify(reponseOrder), () => {
+                    console.log("\n[ _-_- ] Réponse envoyée");
+                });
+            })
 
     } catch (error) {
-        console.error(" [ -- ] Erreur pendant le traitement de la requette de consommation : %s", error);
-    }
+    console.error(" [ -- ] Erreur pendant le traitement de la requette de consommation : %s", error);
+
+}
+
 })
+
 
 export const consumer = route
 
