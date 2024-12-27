@@ -24,12 +24,12 @@ route.post("/", (req, res) => {
         rabbitMQService.assertChannel('producer');
 
 
-        for (var currentProduct in req.body) {
+        for (let currentProduct of req.body) {
             let routingKey = '';
             let suffixKey = '.order';
 
             // Récupération du nom des fourssiseur via leur id (un produit en à obligatoirement 1 )
-            setupRbtmq.getProviderNameById(req.body[currentProduct].provider_id)
+            setupRbtmq.getProviderNameById(currentProduct.provider_id)
 
                 .then((providers_info) => {
 
@@ -40,7 +40,7 @@ route.post("/", (req, res) => {
                     }
                     routingKey = provider_name.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
                     routingKey = routingKey.replaceAll(' ', '-');
-                    rabbitMQService.publish(req.body[currentProduct], routingKey);
+                    rabbitMQService.publish(currentProduct, routingKey);
                 })
         }
 
