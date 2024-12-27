@@ -17,7 +17,7 @@ export default class DatabaseService {
     #history = [];
     #currentsqlQuery = [];
 
-    constructor(invoquer, host = 'localhost', user = 'root', password = '', database = 'sensei5y_senshop_ps') {
+    constructor(invoquer, host = 'localhost', user = 'root', password = 'password*#21', database = 'sensei5y_senshop_ps') {
         this.host = host;
         this.user = user;
         this.password = password;

@@ -32,7 +32,12 @@ route.post("/", (req, res) => {
             setupRbtmq.getProviderNameById(req.body[currentProduct].provider_id)
 
                 .then((providers_info) => {
-                    let provider_name = providers_info[0].provider_name
+
+                    //Verification si le fournisseur existe, si oui on récupère son nom sinon on met undefined
+                    let provider_name = 'undefined';
+                    if (providers_info && providers_info.length > 0 && providers_info[0].provider_name) {
+                        provider_name = providers_info[0].provider_name;
+                    }
                     routingKey = provider_name.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
                     routingKey = routingKey.replaceAll(' ', '-');
                     rabbitMQService.publish(req.body[currentProduct], routingKey);
