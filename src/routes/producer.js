@@ -23,29 +23,23 @@ route.post("/", (req, res) => {
         que la connexion */
         rabbitMQService.assertChannel('producer');
 
-
+        // pour chaque produit nous produissant une notif
         for (let currentProduct of req.body) {
             let routingKey = '';
-            let suffixKey = '.order';
 
-            // Récupération du nom des fourssiseur via leur id (un produit en à obligatoirement 1 )
-            setupRbtmq.getProviderNameById(currentProduct.provider_id)
-
+            // Récupération du nom des queues des fourssiseur via leur id (un produit en à obligatoirement 1 )
+            setupRbtmq.getQueueNamebyId(currentProduct.provider_id)
                 .then((providers_info) => {
 
-                    //Verification si le fournisseur existe, si oui on récupère son nom sinon on met undefined
-                    let provider_name = 'undefined';
-                    if (providers_info && providers_info.length > 0 && providers_info[0].provider_name) {
-                        provider_name = providers_info[0].provider_name;
+                    //Verification si le fournisseur existe, si oui on récupère le nom de la queue sinon on met undefined
+                    let queue_name = 'undefined';
+                    if (providers_info && providers_info.length > 0 && providers_info[0].queue_name) {
+                        queue_name = providers_info[0].queue_name;
                     }
-                    routingKey = provider_name.trim() + suffixKey; // voici comment on accède a l'element body de l'object req
-                    routingKey = routingKey.replaceAll(' ', '-');
+                    routingKey = queue_name;
                     rabbitMQService.publish(currentProduct, routingKey);
                 })
         }
-
-        // pour chaque produit nous produissant une notif
-
 
         res.statusCode = 200 // ok
         res.setHeader('content-type', "text/html")

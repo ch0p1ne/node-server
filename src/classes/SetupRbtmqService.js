@@ -48,8 +48,25 @@ export default class SetupRbtmqServices {
         });
     }
 
+    /**
+     * Récupère le nom du fournisseur via son ID
+     * @param {int} id 
+     * @returns [ {provider_name: string} ]
+     */
     async getProviderNameById(id) {
         let sqlStatement = 'SELECT provider_name FROM providers JOIN product_shop ON id_provider = provider_id where provider_id = ? limit 1 ';
+        await this.connection.preparedStatement(sqlStatement, [ id ]);
+        
+        return this.connection.getResulsFetch();
+    }
+
+    /**
+     * Récupère le nom de la queue assigné au fournisseur via son ID
+     * @param {int} id 
+     * @returns [ {rbtmq_queue_name: string} ]
+     */
+    async getQueueNamebyId(id) {
+        let sqlStatement = 'SELECT rbtmq_order_queue FROM providers JOIN product_shop ON id_provider = provider_id where provider_id = ? limit 1 ';
         await this.connection.preparedStatement(sqlStatement, [ id ]);
         
         return this.connection.getResulsFetch();
