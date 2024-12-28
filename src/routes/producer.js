@@ -33,8 +33,8 @@ route.post("/", (req, res) => {
 
                     //Verification si le fournisseur existe, si oui on récupère le nom de la queue sinon on met undefined
                     let queue_name = 'undefined';
-                    if (providers_info && providers_info.length > 0 && providers_info[0].queue_name) {
-                        queue_name = providers_info[0].queue_name;
+                    if (providers_info && providers_info.length > 0 && providers_info[0].rbtmq_order_queue) {
+                        queue_name = providers_info[0].rbtmq_order_queue;
                     }
                     routingKey = queue_name;
                     rabbitMQService.publish(currentProduct, routingKey);
