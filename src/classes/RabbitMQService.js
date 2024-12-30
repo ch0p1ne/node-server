@@ -119,7 +119,7 @@ export default class RabbitMQService {
                 routingKey = '#.order.#'
             }
             await this.activeChannel.bindQueue(queueName, exchange, routingKey);
-            console.log("\t [ ++ ] Bindage de la queue %s réussi avec la routingKey %s", this.activeQueue.queueName, routingKey);
+            console.log("\t [ ++ ] Bindage de la queue %s réussi avec la routingKey %s", queueName, routingKey);
 
 
         } catch (error) {

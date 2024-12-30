@@ -15,7 +15,7 @@ export default class SetupRbtmqServices {
         this.connection = new DatabaseService('setup queue', 'localhost', 'root', 'password*#21');
         this.rabbitMQService = new RabbitMQService('setup queue');
         this.queueNameList = [];
-        this.sqlQuery1 = 'SELECT provider_name from providers'
+        this.sqlQuery1 = 'SELECT provider_name, rbtmq_order_queue from providers'
     }
 
 
@@ -25,7 +25,7 @@ export default class SetupRbtmqServices {
             await this.connection.initConnection();
             await this.connection.preparedStatement(this.sqlQuery1);
 
-            this.beginningPopulize();
+            await this.beginningPopulize();
             
             // Fermeture de cette connexion apres un delay
             console.log("    [ >+ setup queue ] Setup des queue terminer.");       
@@ -36,16 +36,22 @@ export default class SetupRbtmqServices {
         }
     }
 
+    // TODO changement de nom de variable
     beginningPopulize() {
-        this.connection.getResulsFetch().forEach(async (result) => {
-            let prefixQueue = result.provider_name.trim();
-            let completQueueName = prefixQueue +  '.order';
-            let routingkey = prefixQueue + '.#'
-
-            // L'initialisation d'un object rabbitMQService creer un chanel de base
-            await this.rabbitMQService.assertQueue(completQueueName)
-            await this.rabbitMQService.bindQueue(completQueueName, routingkey)
-        });
+        try {
+            this.connection.getResulsFetch().forEach(async (result) => {
+                let queueName = result.rbtmq_order_queue.trim();
+                let routingkey = queueName + '.#'
+    
+                // L'initialisation d'un object rabbitMQService creer un chanel de base
+                await this.rabbitMQService.assertQueue(queueName);
+                await this.rabbitMQService.bindQueue(queueName, routingkey);
+            });
+            
+        } catch (error) {
+            console.error(" [ -- ] Erreur pendant la polulation des queue: %s", error);
+            
+        }
     }
 
     /**
