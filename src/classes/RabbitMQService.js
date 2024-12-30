@@ -48,13 +48,13 @@ export default class RabbitMQService {
             }
             this.connection = await amqp.connect(url);
             console.log("\n [ >+ %s ] Connexion à RabbitMQ établie ", this.invoquer);
-            
+
             this.producerChannel = await this.connection.createChannel();
             console.log("    [ ++ ] Chanel de production de message crée");
             this.activeChannel = this.producerChannel
 
 
-            await this.producerChannel.assertExchange(this.activeExchange, 'topic', { durable : true});
+            await this.producerChannel.assertExchange(this.activeExchange, 'topic', { durable: true });
             console.log("    [ ++ ] L'exchange est crée");
 
             await this.producerChannel.assertQueue('admin.order', { durable: true });
@@ -77,12 +77,12 @@ export default class RabbitMQService {
     async assertChannel(consumerName) {
         try {
 
-            if(consumerName === 'producer') {
+            if (consumerName === 'producer') {
                 this.activeChannel = this.producerChannel
                 console.log("\n [ !! ] Utilisation du chanel du Producer");
 
                 return false;
-                
+
             }
             // determine si un canal est deja creer pour ce consommateur
             if (this.consummerChannels[consumerName]) {
@@ -123,7 +123,7 @@ export default class RabbitMQService {
 
 
         } catch (error) {
-            console.error(" [ -- ] Erreur lors du Binding de %s a l'echange %s %s", this.activeQueue.queueName, this.activeExchange , error);
+            console.error(" [ -- ] Erreur lors du Binding de %s a l'echange %s %s", this.activeQueue.queueName, this.activeExchange, error);
 
         }
     }
@@ -138,7 +138,9 @@ export default class RabbitMQService {
         try {
             this.activeQueue.queueName = queueName
             this.activeQueue.queue = await channel.assertQueue(queueName, { durable: true, exclusive: false })
-            this.messageAwait[queueName] = [];
+            if (!this.messageAwait[queueName]) {
+                this.messageAwait[queueName] = [];
+            }
             console.log("\t [ ++ ] Queue crée avec succes");
 
         } catch (error) {
@@ -158,7 +160,7 @@ export default class RabbitMQService {
             console.log(" [ > ] En attente de message RabbitMQ ");
             channel.consume(queueName, async (msg) => {
                 if (msg.content) {
-                    console.log("\n\t [ ++ ] Message consummer sur la queue %s par le server => ...", queueName);
+                    console.log("\n\t [ ++ ] Messages consummer sur la queue %s par le server => ...", queueName);
 
                     this.messageAwait[queueName].push(JSON.parse(msg.content.toString()));
 
@@ -197,6 +199,23 @@ export default class RabbitMQService {
     }
 
     /**
+     * Ferme le canal RabbitMQ spécifier, un canal spécifique est déterminer par le nom du consommateur
+     * @param {string} consumerName 
+     */
+    async closeConsumerChanel(consumerName) {
+        try {
+            const channel = this.consummerChannels[consumerName];
+            await channel.close();
+            this.consummerChannels[consumerName] = null;
+            console.log("\t\t [ ++ ] Canal supprimer pour : %s", consumerName);
+
+        } catch (error) {
+            console.error(" [ -- ] Erreur pendant la fermeture des chanel : %s", error);
+
+        }
+    }
+
+    /**
      * Ferme tous les channels consummer et producer puis ferme la connexion
      * @returns {void}
      */
@@ -204,9 +223,7 @@ export default class RabbitMQService {
         try {
             // Fermeture de tous les canaux d'aborbs
             for (let consumerName in this.consummerChannels) {
-                const channel = this.consummerChannels[consumerName];
-                await channel.close();
-                console.log("\t\t [ ++ ] Canal supprimer pour : %s", consumerName);
+                this.closeConsumerChanel(consumerName)
             }
             await this.producerChannel.close()
 
