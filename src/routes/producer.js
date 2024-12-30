@@ -25,7 +25,6 @@ route.post("/", (req, res) => {
 
         // pour chaque produit nous produissant une notif
         for (let currentProduct of req.body) {
-            let routingKey = '';
 
             // Récupération du nom des queues des fourssiseur via leur id (un produit en à obligatoirement 1 )
             setupRbtmq.getQueueNamebyId(currentProduct.provider_id)
@@ -33,10 +32,12 @@ route.post("/", (req, res) => {
 
                     //Verification si le fournisseur existe, si oui on récupère le nom de la queue sinon on met undefined
                     let queue_name = 'undefined';
+                    let routingKey = 'order';
+                    
                     if (providers_info && providers_info.length > 0 && providers_info[0].rbtmq_order_queue) {
                         queue_name = providers_info[0].rbtmq_order_queue;
+                        routingKey = queue_name;
                     }
-                    routingKey = queue_name;
                     rabbitMQService.publish(currentProduct, routingKey);
                 })
         }
