@@ -17,13 +17,19 @@ route.post("/", (req, res) => {
             return
         }
 
+        let custumerID;
+        if (req.header("Custumer-id") === '') {
+            custumerID = 0;
+        } else {
+            custumerID = parseInt(req.header("Custumer-id"));
+        }
 
 
         /* Utilise le chanel Production de message qui est initialiser en même temps
         que la connexion */
         rabbitMQService.assertChannel('producer');
 
-        // pour chaque produit nous produissant une notif
+        // pour chaque produit nous produissant une notification
         for (let currentProduct of req.body) {
 
             // Récupération du nom des queues des fourssiseur via leur id (un produit en à obligatoirement 1 )
@@ -41,6 +47,15 @@ route.post("/", (req, res) => {
                     rabbitMQService.publish(currentProduct, routingKey);
                 })
         }
+
+        /* Sauvegarde la commande et ses éléments dans la base de donnée */
+        rabbitMQService.saveOrderToDatabase(custumerID, req.body)
+            .then((numOrder) => {
+                for (let currentProduct of req.body) {
+                    rabbitMQService.saveOrderDetailsToDatabase(custumerID, currentProduct, numOrder);
+                }
+            });
+
 
         res.statusCode = 200 // ok
         res.setHeader('content-type', "text/html")

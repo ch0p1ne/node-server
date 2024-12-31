@@ -61,7 +61,7 @@ export default class DatabaseService {
             this.results = results;
             this.fields = fields;
             let data = []
-            console.log("    [ >+ ] Requette preparer executer");
+            console.log("\n    [ >+ ] Requette preparer executer");
 
             return [results, fields]
 

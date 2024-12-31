@@ -1,4 +1,6 @@
 import amqp from 'amqplib'
+import { generateInvoiceNumber, generateNumOrder, parseData } from '../utils/helperFunctions.js';
+import DatabaseService from './DatabaseService.js';
 
 /**
  * Class Utilitaire assurant la communication et l'interraction entre ce server NodeJS  et RabbitMQ
@@ -16,11 +18,13 @@ export default class RabbitMQService {
     messageAwait = [];
     activeExchange = null;
     exchanges = [];
-    invoquer = ''
+    invoquer = '';
+    connectionDB = null;
 
 
     constructor(invoquer) {
         this.connection = null;
+        this.connectionDB = new DatabaseService('RabbitMQService');
         this.producerChannel = null;
         this.consummerChannels = [];
         this.queueList = [];
@@ -62,6 +66,10 @@ export default class RabbitMQService {
             await this.producerChannel.bindQueue('admin.order', this.activeExchange, "#.order.#")
             console.log("    [ ++ ] Binding de la queue %s a l'exchange %s crée", 'admin.order', this.activeExchange);
             console.log(" [ >+ ] Tous est ok");
+
+            await this.connectionDB.initConnection();
+            console.log(" [ >+ %s ] Connexion a la base de donnée établie", this.invoquer);
+
 
         } catch (error) {
             console.error('\n [ -- ] Erreur de connection RabbitMQ : %s', error)
@@ -190,12 +198,67 @@ export default class RabbitMQService {
             // Envoi du message à l'échange spécifié avec clé de routage
             await this.activeChannel.publish(exchange, routingKey, Buffer.from(msg));
 
-            console.log("\n\t [ x ] Message envoyé vers %s:%s => \n\t\t [ # ]'%s'", exchange, routingKey, msg);
+            console.log("\t [ x ] Message envoyé vers %s:%s => \n\t\t [ # ]'%s'", exchange, routingKey, msg);
         } catch (error) {
             console.error(" [ -- ] Erreur de publication des donnée vers l'echange , %s", error);
 
         }
 
+    }
+
+    /**
+     * Enregistre les informations d'une commande dans la base de donnée
+     * @param {bigint} custumer_id 
+     * @param {JSON | object} data 
+     * @returns 
+     */
+    async saveOrderToDatabase(custumer_id, data) {
+        try {
+            let invoice_num = 0;
+            const sqlQuery1 = 'SELECT count(*) FROM sales_orders';
+            await this.connectionDB.preparedStatement(sqlQuery1)
+                .then(() => {
+                    const results = this.connectionDB.getResulsFetch();
+                    invoice_num = results[0]['count(*)'] + 1;
+
+                })
+
+            const num_order = generateNumOrder();
+            const parsedData = parseData(data);
+            const formatedInvoiceNumber = generateInvoiceNumber(invoice_num);
+            const sqlQuery2 = `INSERT INTO sales_orders (num_order, nbr_products, custumer_id, invoice) VALUES (?, ?, ?, ?)`;
+            this.connectionDB.preparedStatement(sqlQuery2, [num_order, parsedData.length, custumer_id, formatedInvoiceNumber])
+                .then(() => {
+                    console.log("\t [ Save Order ] Commande sauvegarder dans la base de donnée avec le numero de commande : %s", num_order);
+                })
+
+            return num_order;
+
+        } catch (error) {
+            console.error(" [ -- ] Erreur lors de la sauvegarde des informations de commande (%s)dans la base de donnée : %s", num_order,error);
+
+        }
+        return 1
+    }
+
+    /**
+     * Enregistre les details du produit d'une commande dans la base de donnée
+     * @param {int} custumer_id 
+     * @param {object | JSON} data 
+     * @param {int} num_order 
+     */
+    async saveOrderDetailsToDatabase(custumer_id, data, num_order) {
+        try {
+            const parsedData = parseData(data);
+            const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, custumer_id) VALUES (?, ?, ?, ?)";
+            this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, custumer_id])
+                .then((resolve) => {
+                    console.log("\t [ Save Order Details ] Details du produit de la commande (%s) sauvegarder dans la base de donnée", num_order);
+                });
+        } catch (error) {
+            console.error(" [ -- ] Erreur lors de la sauvegarde des details de la commande (%s) dans la base de donnée : %s", num_order, error);
+
+        }
     }
 
     /**

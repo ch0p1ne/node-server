@@ -19,38 +19,40 @@ export default class SetupRbtmqServices {
     }
 
 
-    async populizeRabbitQueue () {
+    async populizeRabbitQueue() {
         try {
             await this.rabbitMQService.initialize();
             await this.connection.initConnection();
             await this.connection.preparedStatement(this.sqlQuery1);
 
-            await this.beginningPopulize();
-            
-            // Fermeture de cette connexion apres un delay
-            console.log("    [ >+ setup queue ] Setup des queue terminer.");       
-            setTimeout( () => this.rabbitMQService.close(), 7100);      
-            
+            this.beginningPopulize()
+                .then(() => {
+
+                    // Fermeture de cette connexion apres un delay
+                    console.log("    [ >+ Setup Queue ] Setup des queue terminer.");
+                    setTimeout(() => this.rabbitMQService.close(), 1000);
+                });
+
         } catch (error) {
-            console.log(" [ -- ] Erreur SETUP; pendant la population des queues %s", error);
+            console.log(" [ -- ] Erreur SETUP pendant la population des queues %s", error);
         }
     }
 
     // TODO changement de nom de variable
-    beginningPopulize() {
+    async beginningPopulize() {
         try {
             this.connection.getResulsFetch().forEach(async (result) => {
                 let queueName = result.rbtmq_order_queue.trim();
                 let routingkey = queueName + '.#'
-    
+
                 // L'initialisation d'un object rabbitMQService creer un chanel de base
                 await this.rabbitMQService.assertQueue(queueName);
                 await this.rabbitMQService.bindQueue(queueName, routingkey);
             });
-            
+
         } catch (error) {
-            console.error(" [ -- ] Erreur pendant la polulation des queue: %s", error);
-            
+            console.error(" [ -- ] Erreur pendant la population des queues : %s", error);
+
         }
     }
 
@@ -61,8 +63,8 @@ export default class SetupRbtmqServices {
      */
     async getProviderNameById(id) {
         let sqlStatement = 'SELECT provider_name FROM providers JOIN product_shop ON id_provider = provider_id where provider_id = ? limit 1 ';
-        await this.connection.preparedStatement(sqlStatement, [ id ]);
-        
+        await this.connection.preparedStatement(sqlStatement, [id]);
+
         return this.connection.getResulsFetch();
     }
 
@@ -73,8 +75,8 @@ export default class SetupRbtmqServices {
      */
     async getQueueNamebyId(id) {
         let sqlStatement = 'SELECT rbtmq_order_queue FROM providers JOIN product_shop ON id_provider = provider_id where provider_id = ? limit 1 ';
-        await this.connection.preparedStatement(sqlStatement, [ id ]);
-        
+        await this.connection.preparedStatement(sqlStatement, [id]);
+
         return this.connection.getResulsFetch();
     }
 }

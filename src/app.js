@@ -14,7 +14,7 @@ export const setupRbtmq = new SetupRbtmqServices();
     console.log("[X] Serveur en cours de demarage...");
 
     // Setup
-    console.log("[ ~~ ] Setup du server");
+    console.log("[ >Setup du serveur< #> ] Démarrage");
 
     await setupRbtmq.populizeRabbitQueue();
     await rabbitMQService.initialize();
@@ -42,8 +42,8 @@ export const setupRbtmq = new SetupRbtmqServices();
 
 
     app.listen(port, () => {
-        setTimeout(() => console.log(' [ ~~ ] Fin du Setup\n\t Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port)
-        , 7500);
+        setTimeout(() => console.log(' [ Setup du serveur ] ++Fin++\n\t [ INFO ] Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port)
+        , 1000);
     });
 
 })()
