@@ -250,6 +250,9 @@ export default class RabbitMQService {
     async saveOrderDetailsToDatabase(custumer_id, data, num_order) {
         try {
             const parsedData = parseData(data);
+            if (!parsedData.provider_id)
+                parsedData.provider_id = null;
+
             const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, custumer_id) VALUES (?, ?, ?, ?)";
             this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, custumer_id])
                 .then((resolve) => {
