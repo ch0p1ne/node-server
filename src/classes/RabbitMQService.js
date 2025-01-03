@@ -117,7 +117,7 @@ export default class RabbitMQService {
     /**
      * Creer un binding entre une queue et un exchange.
      * @param {string} queueName 
-     * @param {string} exchange 
+     * @param {null | amqp.Exchange} exchange
      * @param {string} routingKey 
      * @param {boolean} admin 
      */
@@ -158,8 +158,8 @@ export default class RabbitMQService {
     }
 
     /**
-     * Fonction qui démare la consummation d'une queue jusqu'a ce qu'une connexion ou un canal soit fermé
-     * les messages consommer sont stocker sous forme d'objet { queue_propriètaire/msg } dans un tableau
+     * Fonction qui démare la consummation d'une queue jusqu'a ce qu'une connexion ou un canal soit fermée.
+     * Les messages consommer sont stocker sous forme d'objet { queue_propriètaire/msg } dans un tableau
      * @param {string} queueName 
      * @param {amqp.channel} channel 
      */

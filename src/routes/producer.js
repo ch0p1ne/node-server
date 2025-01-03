@@ -29,30 +29,34 @@ route.post("/", (req, res) => {
         que la connexion */
         rabbitMQService.assertChannel('producer');
 
-        // pour chaque produit nous produissant une notification
-        for (let currentProduct of req.body) {
-
-            // Récupération du nom des queues des fourssiseur via leur id (un produit en à obligatoirement 1 )
-            setupRbtmq.getQueueNamebyId(currentProduct.provider_id)
-                .then((providers_info) => {
-
-                    //Verification si le fournisseur existe, si oui on récupère le nom de la queue sinon on met undefined
-                    let queue_name = 'undefined';
-                    let routingKey = 'order';
-                    
-                    if (providers_info && providers_info.length > 0 && providers_info[0].rbtmq_order_queue) {
-                        queue_name = providers_info[0].rbtmq_order_queue;
-                        routingKey = queue_name;
-                    }
-                    rabbitMQService.publish(currentProduct, routingKey);
-                })
-        }
-
         /* Sauvegarde la commande et ses éléments dans la base de donnée */
         rabbitMQService.saveOrderToDatabase(custumerID, req.body)
             .then((numOrder) => {
+
+                // Pour chaque produit nous produissant aussi une notification en plus de la save en bdd
                 for (let currentProduct of req.body) {
                     rabbitMQService.saveOrderDetailsToDatabase(custumerID, currentProduct, numOrder);
+
+                    /* TODO
+                        Le site web envoie en amount un ${provider_id} definie a null si la valeur en bdd est manquante,
+                        il faudra le géré coté server aussi.
+                    */
+                    // Récupération du nom des queues des fourniseur via leur id (un produit peut ne pas en avoir )
+                    setupRbtmq.getQueueNamebyId(currentProduct.provider_id)
+                        .then((providers_info) => {
+
+                            // Ajout du numéro de command a la variable contenant les informations du produit
+                            currentProduct.number_order = numOrder;
+
+                            // Verification si le fournisseur existe
+                            let queue_name = 'undefined';
+                            let routingKey = 'order';
+                            if (providers_info && providers_info.length > 0 && providers_info[0].rbtmq_order_queue) {
+                                queue_name = providers_info[0].rbtmq_order_queue;
+                                routingKey = queue_name;
+                            }
+                            rabbitMQService.publish(currentProduct, routingKey);
+                        })
                 }
             });
 

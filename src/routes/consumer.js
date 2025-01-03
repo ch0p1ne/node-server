@@ -2,19 +2,20 @@ import express from 'express'
 import { rabbitMQService } from '../app.js'
 
 var route = express.Router()
+const adminQueue = "admin.order"
 
 route.get("/get-notification/command", async (req, res) => {
     try {
         console.log("\n [ >REQUETE< consommation ] Recus");
 
-        const queue = req.header('Order-queue') // req.body;
+        let queue = req.header('Order-queue') // req.body;
         if (queue == 'admin') {
-            queue = 'admin.order';
+            queue = adminQueue;
         }
         const exchange_name = rabbitMQService.activeExchange;
         const consumer_name = req.header('Provider-name');
-        var reponseOrder = [];
-        var numberOfMsg = 0;
+        let responseOrder = [];
+        let numberOfMsg = 0;
         res.statusCode = 200;
         res.setHeader("content-type", "application/json;charset=utf-8");
         if (await rabbitMQService.assertChannel(consumer_name)) {
@@ -24,16 +25,16 @@ route.get("/get-notification/command", async (req, res) => {
         rabbitMQService.consumeMsg()
             .then((resolve) => {
                 numberOfMsg = rabbitMQService.messageAwait[queue].length;
-                console.log(" [ ++ ] Message sur la queue %s recuperer : %d", queue, numberOfMsg);
+                console.log(" [ ++ ] Nombre de Message sur la queue %s recuperer : %d", queue, numberOfMsg);
                 for (let i = 0; i < numberOfMsg; i++) {
 
-                    reponseOrder.push(rabbitMQService.messageAwait[queue][0])
+                    responseOrder.push(rabbitMQService.messageAwait[queue][0])
                     rabbitMQService.messageAwait[queue].shift();
                 }
 
-                console.log(JSON.stringify(reponseOrder));
+                console.log(JSON.stringify(responseOrder));
 
-                res.end(JSON.stringify(reponseOrder), () => {
+                res.end(JSON.stringify(responseOrder), () => {
                     console.log(" \n [ >REQUETE< consommation ] Réponse envoyée");
                 });
 
