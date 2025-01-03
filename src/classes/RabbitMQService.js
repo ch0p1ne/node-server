@@ -250,11 +250,19 @@ export default class RabbitMQService {
     async saveOrderDetailsToDatabase(custumer_id, data, num_order) {
         try {
             const parsedData = parseData(data);
+
+            // Une verification de l'existance des variables, sinon quoi nous les déclarons/initialisons pour eviter des erreurs
             if (!parsedData.provider_id)
                 parsedData.provider_id = null;
+            if (!parsedData.product_qte)
+                parsedData.product_qte = null;
+            if (!parsedData.product_name)
+                parsedData.product_name = null;
+            if (!parsedData.product_id)
+                parsedData.product_id = null;
 
-            const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, custumer_id) VALUES (?, ?, ?, ?)";
-            this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, custumer_id])
+            const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, product_name, product_qte, custumer_id) VALUES (?, ?, ?, ?, ?, ?)";
+            this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, parsedData.product_name, parsedData.product_qte, custumer_id])
                 .then((resolve) => {
                     console.log("\t [ Save Order Details ] Details du produit de la commande (%s) sauvegarder dans la base de donnée", num_order);
                 });
@@ -294,8 +302,9 @@ export default class RabbitMQService {
             await this.producerChannel.close()
 
             // Verification d'une connexion puis fermuture de la connexion
-            if (!this.connection)
+            if (!this.connection) {
                 throw new Error("Vous ne pouvez fermer une connexion qui n'existe pas, Initialiser d'abords le servive avec init()");
+            }
             await this.connection.close()
             console.log(" [ >+ %s ] Connexion et channels correctement fermé", this.invoquer);
 
