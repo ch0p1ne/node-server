@@ -8,7 +8,7 @@ route.post("/", (req, res) => {
     try {
         console.log("\n [ >REQUETTE< producer ] Recue");
 
-        if (!req.body) {
+        if (!req.body[0]) {
             res.statusCode = 403; // Interdit
             res.setHeader('content-type', "text/html");
             res.end("<h1>Vous ne pouvez pas envoyer une Notification pour une commande qui ne contient pas de produit </h1>");
@@ -16,6 +16,8 @@ route.post("/", (req, res) => {
 
             return
         }
+        console.log("voici le contenue du body : " + req.body);
+        
 
         let custumerID;
         if (req.header("Custumer-id") === '') {
