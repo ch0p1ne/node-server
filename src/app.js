@@ -1,12 +1,16 @@
 import express from 'express'
 import RabbitMQService from './classes/RabbitMQService.js'
 import SetupRbtmqServices from './classes/SetupRbtmqService.js'
+import { parseConfigurationFile } from "./utils/initConfig.js";
 import { producer } from './routes/producer.js'
 import { consumer } from './routes/consumer.js'
 import cors from 'cors'
 
-const app = express()
-const port = 8090
+const parsedConfigFile = parseConfigurationFile();
+
+const app = express();
+const host = parsedConfigFile.host;
+const port = parsedConfigFile.port;
 const rabbitMQService = new RabbitMQService('main service');
 export const setupRbtmq = new SetupRbtmqServices();
 
@@ -21,7 +25,7 @@ export const setupRbtmq = new SetupRbtmqServices();
 
     // Configuration du middleware CORS
     app.use(cors({
-        origin: 'http://localhost', // Autoriser cette origine uniquement
+        origin: '*', // Autoriser cette origine uniquement
         methods: 'GET,POST,PUT,DELETE', // Méthodes HTTP autorisées
         allowedHeaders: 'Content-Type,Authorization, order-queue, provider-name',  // En-têtes autorisés
     }));
@@ -41,8 +45,8 @@ export const setupRbtmq = new SetupRbtmqServices();
 
 
 
-    app.listen(port, () => {
-        setTimeout(() => console.log(' [ Setup du serveur ] ++Fin++\n\t [ INFO ] Serveur prêt et en cours d\'exécution sur [ %s : %s]', 'localhost', port)
+    app.listen(port, host,() => {
+        setTimeout(() => console.log(' [ Setup du serveur ] ++Fin++\n\t [ INFO ] Serveur prêt et en cours d\'exécution sur [ %s : %s]', host, port)
         , 1000);
     });
 
