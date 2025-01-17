@@ -3,3 +3,5 @@ port: 8091
 
 # valeur possible 'debug' ou  'production'
 environment: "production"
+
+allowed_header: ""
