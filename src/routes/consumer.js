@@ -13,10 +13,14 @@ route.get("/get-notification/command", async (req, res) => {
             queue = adminQueue;
 
         const exchange_name = rabbitMQService.activeExchange;
-        if (req.header('Provider-name') === null || req.header('Provider-name') === 'null')
-            const consumer_name = 'admin';
-        else
-            const consumer_name = req.header('Provider-name');
+        let consumer_name;
+
+        if (req.header('Provider-name') === null || req.header('Provider-name') === 'null') {
+            consumer_name = 'admin';
+        }
+        else {
+            consumer_name = req.header('Provider-name');
+        }
 
         let responseOrder = [];
         let numberOfMsg = 0;
