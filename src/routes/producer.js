@@ -19,11 +19,11 @@ route.post("/", (req, res) => {
         console.log("voici le contenue du body : " + req.body);
         
 
-        let custumerID;
-        if (req.header("Custumer-id") === '') {
-            custumerID = 0;
+        let customerID;
+        if (req.header("Customer-id") === '') {
+            customerID = 0;
         } else {
-            custumerID = parseInt(req.header("Custumer-id"));
+            customerID = parseInt(req.header("Customer-id"));
         }
 
 
@@ -32,12 +32,12 @@ route.post("/", (req, res) => {
         rabbitMQService.assertChannel('producer');
 
         /* Sauvegarde la commande et ses éléments dans la base de donnée */
-        rabbitMQService.saveOrderToDatabase(custumerID, req.body)
+        rabbitMQService.saveOrderToDatabase(customerID, req.body)
             .then((numOrder) => {
 
                 // Pour chaque produit nous produissant aussi une notification en plus de la save en bdd
                 for (let currentProduct of req.body) {
-                    rabbitMQService.saveOrderDetailsToDatabase(custumerID, currentProduct, numOrder);
+                    rabbitMQService.saveOrderDetailsToDatabase(customerID, currentProduct, numOrder);
 
                     /* TODO
                         Le site web envoie en amount un ${provider_id} definie a null si la valeur en bdd est manquante,
