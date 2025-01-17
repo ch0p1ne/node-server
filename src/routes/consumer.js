@@ -9,9 +9,9 @@ route.get("/get-notification/command", async (req, res) => {
         console.log("\n [ >REQUETE< consommation ] Recus");
 
         let queue = req.header('Order-queue') // req.body;
-        if (queue == 'admin') {
+        if (req.header('User-position') === "admin")
             queue = adminQueue;
-        }
+
         const exchange_name = rabbitMQService.activeExchange;
         const consumer_name = req.header('Provider-name');
         let responseOrder = [];
