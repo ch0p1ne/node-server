@@ -208,11 +208,11 @@ export default class RabbitMQService {
 
     /**
      * Enregistre les informations d'une commande dans la base de donnée
-     * @param {bigint} custumer_id 
+     * @param {bigint} customer_id
      * @param {JSON | object} data 
      * @returns 
      */
-    async saveOrderToDatabase(custumer_id, data) {
+    async saveOrderToDatabase(customer_id, data) {
         try {
             let invoice_num = 0;
             const sqlQuery1 = 'SELECT count(*) FROM sales_orders';
@@ -226,8 +226,8 @@ export default class RabbitMQService {
             const num_order = generateNumOrder();
             const parsedData = parseData(data);
             const formatedInvoiceNumber = generateInvoiceNumber(invoice_num);
-            const sqlQuery2 = `INSERT INTO sales_orders (num_order, nbr_products, custumer_id, invoice) VALUES (?, ?, ?, ?)`;
-            this.connectionDB.preparedStatement(sqlQuery2, [num_order, parsedData.length, custumer_id, formatedInvoiceNumber])
+            const sqlQuery2 = `INSERT INTO sales_orders (num_order, nbr_products, customer_id, invoice) VALUES (?, ?, ?, ?)`;
+            this.connectionDB.preparedStatement(sqlQuery2, [num_order, parsedData.length, customer_id, formatedInvoiceNumber])
                 .then(() => {
                     console.log("\t [ Save Order ] Commande sauvegarder dans la base de donnée avec le numero de commande : %s", num_order);
                 })
@@ -243,11 +243,11 @@ export default class RabbitMQService {
 
     /**
      * Enregistre les details du produit d'une commande dans la base de donnée
-     * @param {int} custumer_id 
+     * @param {int} customer_id
      * @param {object | JSON} data 
      * @param {int} num_order 
      */
-    async saveOrderDetailsToDatabase(custumer_id, data, num_order) {
+    async saveOrderDetailsToDatabase(customer_id, data, num_order) {
         try {
             const parsedData = parseData(data);
 
@@ -261,8 +261,8 @@ export default class RabbitMQService {
             if (!parsedData.product_id)
                 parsedData.product_id = null;
 
-            const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, product_name, product_qte, custumer_id) VALUES (?, ?, ?, ?, ?, ?)";
-            this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, parsedData.product_name, parsedData.product_qte, custumer_id])
+            const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, product_name, product_qte, customer_id) VALUES (?, ?, ?, ?, ?, ?)";
+            this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, parsedData.product_name, parsedData.product_qte, customer_id])
                 .then((resolve) => {
                     console.log("\t [ Save Order Details ] Details du produit de la commande (%s) sauvegarder dans la base de donnée", num_order);
                 });
