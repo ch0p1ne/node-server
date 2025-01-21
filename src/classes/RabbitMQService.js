@@ -264,7 +264,7 @@ export default class RabbitMQService {
             const sqlQuery1 = "INSERT INTO sales_orders_details (num_order, provider_id, product_shop_id, product_name, product_qte, customer_id) VALUES (?, ?, ?, ?, ?, ?)";
             this.connectionDB.preparedStatement(sqlQuery1, [num_order, parsedData.provider_id, parsedData.product_id, parsedData.product_name, parsedData.product_qte, customer_id])
                 .then((resolve) => {
-                    console.log("\t [ Save Order Details ] Details du produit de la commande (%s) sauvegarder dans la base de donnée", num_order);
+                    console.log("\t [ Save Order Details ] Details du produit (%s) de la commande (%s) sauvegarder dans la base de donnée", parsedData.product_name, num_order);
                 });
         } catch (error) {
             console.error(" [ -- ] Erreur lors de la sauvegarde des details de la commande (%s) dans la base de donnée : %s", num_order, error);
