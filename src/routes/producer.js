@@ -43,12 +43,14 @@ route.post("/", (req, res) => {
                         Le site web envoie en amount un ${provider_id} definie a null si la valeur en bdd est manquante,
                         il faudra le géré coté server aussi.
                     */
-                    // Récupération du nom des queues des fourniseur via leur id (un produit peut ne pas en avoir )
+                    // Récupération du nom des queues des fourniseurs via leurs id (un produit peut ne pas en avoir )
                     setupRbtmq.getQueueNamebyId(currentProduct.provider_id)
                         .then((providers_info) => {
 
-                            // Ajout du numéro de command a la variable contenant les informations du produit
+                            // Ajout d'information supplémentaire à la notification
                             currentProduct.number_order = numOrder;
+                            currentProduct.customer_id = customerID;
+                            currentProduct.status = "vérification";
 
                             // Verification si le fournisseur existe
                             let queue_name = 'undefined';
