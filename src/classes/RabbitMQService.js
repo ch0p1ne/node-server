@@ -35,6 +35,7 @@ export default class RabbitMQService {
         this.activeExchange = 'order_notification_topic';
         this.exchanges.push(this.activeChannel);
         this.invoquer = invoquer;
+        
 
     }
 

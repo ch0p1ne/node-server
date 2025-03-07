@@ -16,7 +16,6 @@ export const setupRbtmq = new SetupRbtmqServices();
 
 (async () => {
     console.log("[X] Serveur en cours de demarage...");
-
     // Setup
     console.log("[ >Setup du serveur< #> ] Démarrage");
 
@@ -39,11 +38,10 @@ export const setupRbtmq = new SetupRbtmqServices();
     app.use(consumer)
 
     // gère les route non définie
-    app.all(/.*/, function badRequest(req, res, next) {
+    app.all(/.*/, function
+        badRequest(req, res, next) {
         res.status(404).send("<h2>Page introuvable</h2>")
     })
-
-
 
     app.listen(port, host,() => {
         setTimeout(() => console.log(' [ Setup du serveur ] ++Fin++\n\t [ INFO ] Serveur prêt et en cours d\'exécution sur [ %s : %s]', host, port)

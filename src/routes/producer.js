@@ -1,6 +1,7 @@
 import express from 'express'
 import { rabbitMQService } from '../app.js';
 import { setupRbtmq } from '../app.js';
+import {generateNumOrder} from "../utils/helperFunctions.js";
 
 var route = express.Router();
 
@@ -50,6 +51,7 @@ route.post("/", (req, res) => {
                             // Ajout d'information supplémentaire à la notification
                             currentProduct.number_order = numOrder;
                             currentProduct.customer_id = customerID;
+                            currentProduct.notification_id = generateNumOrder();
                             currentProduct.status = "vérification";
 
                             // Verification si le fournisseur existe

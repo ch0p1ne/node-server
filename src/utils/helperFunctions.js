@@ -1,6 +1,6 @@
 
 /**
- * Génère un nombre aléatoire
+ * Génère un numéro de commande aléatoire
  */
 export function generateNumOrder() {
     const timestamp = Date.now();
@@ -36,7 +36,7 @@ export function parseData(jsondata) {
 }
 
 /**
- * Formate le numéro de facture en 'FAC-XXXX'
+ * Formate le numéro de facture au format 'FAC-XXXX'
  * @param {int} invoiceNumber 
  * @returns string
  */
