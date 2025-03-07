@@ -25,10 +25,10 @@ export function parseData(jsondata) {
         return jsondata;
     }
     try {
-        const parsedData = JSON.parse(jsondata);
+        let parsedData;
+        parsedData = JSON.parse(jsondata);
         console.log("jsondata parsed successfully : ", parsedData);
-        return parseData;
-         parsedData;
+        return parsedData;
     } catch (error) {
         console.error("Failed to parse jsondata:", error);
         return null;
@@ -41,6 +41,5 @@ export function parseData(jsondata) {
  * @returns string
  */
 export function generateInvoiceNumber(invoiceNumber) {
-    const formatedInvoiceNumber = 'FAC-' + invoiceNumber
-    return formatedInvoiceNumber;
+    return 'FAC-' + invoiceNumber;
 }

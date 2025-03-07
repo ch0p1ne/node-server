@@ -35,7 +35,7 @@ export default class RabbitMQService {
         this.activeExchange = 'order_notification_topic';
         this.exchanges.push(this.activeChannel);
         this.invoquer = invoquer;
-        
+
 
     }
 
@@ -118,7 +118,7 @@ export default class RabbitMQService {
     /**
      * Creer un binding entre une queue et un exchange.
      * @param {string} queueName 
-     * @param {null | amqp.Exchange} exchange
+     * @param {null | amqp.exchange } exchange
      * @param {string} routingKey 
      * @param {boolean} admin 
      */
