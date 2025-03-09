@@ -1,9 +1,10 @@
 import express from 'express'
 import RabbitMQService from './classes/RabbitMQService.js'
 import SetupRbtmqServices from './classes/SetupRbtmqService.js'
-import { parseConfigurationFile } from "./utils/initConfig.js";
-import { producer } from './routes/producer.js'
-import { consumer } from './routes/consumer.js'
+import {parseConfigurationFile} from "./utils/initConfig.js";
+import {producer} from './routes/producer.js'
+import {consumer} from './routes/consumer.js'
+import {patch} from './routes/patch.js'
 import cors from 'cors'
 
 const parsedConfigFile = parseConfigurationFile();
@@ -25,7 +26,7 @@ export const setupRbtmq = new SetupRbtmqServices();
     // Configuration du middleware CORS
     app.use(cors({
         origin: '*', // Autoriser cette origine uniquement
-        methods: 'GET,POST,PUT,DELETE', // Méthodes HTTP autorisées
+        methods: 'GET, POST, PUT, DELETE, PATCH', // Méthodes HTTP autorisées
         allowedHeaders: 'Content-Type,Authorization, order-queue, provider-name, customer-id, user-position',  // En-têtes autorisés
     }));
 
@@ -36,6 +37,7 @@ export const setupRbtmq = new SetupRbtmqServices();
     // Route
     app.use(producer)
     app.use(consumer)
+    app.use(patch)
 
     // gère les route non définie
     app.all(/.*/, function
@@ -43,14 +45,14 @@ export const setupRbtmq = new SetupRbtmqServices();
         res.status(404).send("<h2>Page introuvable</h2>")
     })
 
-    app.listen(port, host,() => {
+    app.listen(port, host, () => {
         setTimeout(() => console.log(' [ Setup du serveur ] ++Fin++\n\t [ INFO ] Serveur prêt et en cours d\'exécution sur [ %s : %s]', host, port)
-        , 1000);
+            , 1000);
     });
 
 })()
 
-export { rabbitMQService }
+export {rabbitMQService}
 
 
 
