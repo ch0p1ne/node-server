@@ -1,4 +1,4 @@
-host: "137.184.20.73"
+host: "localhost"
 port: 8091
 
 # valeur possible 'debug' ou 'production'
