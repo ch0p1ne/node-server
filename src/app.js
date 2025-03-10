@@ -39,7 +39,7 @@ export const setupRbtmq = new SetupRbtmqServices();
     app.use(consumer)
     app.use(patch)
 
-    // gère les route non définie
+    // gère les routes non définies
     app.all(/.*/, function
         badRequest(req, res) {
         res.status(404).send("<h2>Page introuvable</h2>")
