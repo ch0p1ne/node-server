@@ -4,6 +4,7 @@ import SetupRbtmqServices from './classes/SetupRbtmqService.js'
 import {parseConfigurationFile} from "./utils/initConfig.js";
 import {producer} from './routes/producer.js'
 import {consumer} from './routes/consumer.js'
+import {csharpapp} from './routes/csharpapp.js'
 import {patch} from './routes/patch.js'
 import cors from 'cors'
 
@@ -38,6 +39,7 @@ export const setupRbtmq = new SetupRbtmqServices();
     app.use(producer)
     app.use(consumer)
     app.use(patch)
+    app.use(csharpapp)
 
     // gère les routes non définies
     app.all(/.*/, function
