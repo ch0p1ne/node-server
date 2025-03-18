@@ -21,7 +21,7 @@ route.post('/csharp/save', (req, res) => {
 
         const jsonData = JSON.stringify(req.body);
         console.log(req.body);
-        let sqlQuerry = "INSERT INTO pointage VALUES (null, ?, ?, ?, ?, ?)";
+        let sqlQuerry = "INSERT INTO pointages VALUES (null, ?, ?, ?, ?, ?)";
         dbService.preparedStatement(sqlQuerry, [userId, userName, datePointage, heureArrivee, heureSortie]);
         //dbService.close();
         
