@@ -3,7 +3,7 @@ import express from 'express'
 
 var route = express.Router();
 
-route.patch('/csharp/save', (req, res) => {
+route.post('/csharp/save', (req, res) => {
     try {
         res.statusCode = 200;
         res.setHeader('content-type', 'text/plain;charset=UTF-8');
