@@ -43,3 +43,7 @@ export function parseData(jsondata) {
 export function generateInvoiceNumber(invoiceNumber) {
     return 'FAC-' + invoiceNumber;
 }
+
+export function reverse(string){
+    return string.split("/").reverse().join("");
+}

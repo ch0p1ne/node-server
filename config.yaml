@@ -2,6 +2,6 @@ host: "137.184.20.73"
 port: 8091
 
 # valeur possible 'debug' ou 'production'
-environment: "production"
+environment: "debug"
 
 allowed_header: ""
