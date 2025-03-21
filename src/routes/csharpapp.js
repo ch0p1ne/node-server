@@ -9,22 +9,46 @@ dbService.initConnection();
 
 route.post('/csharp/save', async (req, res) => {
     try {
-        let userId = req.body?.UserID;
+        let zxuserId = req.body?.ZXUserID;
+        let dbuserId = req.body?.DBUserID;
         let userName = req.body?.UserName;
         let datePointage =  req.body?.VerifyDate;
         datePointage = reverse(datePointage);
         let heureArrivee = req.body?.VerifyTime;
         let heureSortie = "";
-        let sqlQuerry = "INSERT INTO pointages VALUES (null, ?, ?, ?, ?, ?)";
+        let recordID = req.body?.RecordID;
+        let sqlQuerry = "INSERT INTO pointages VALUES (null, ?, ?, ?, ?, ?, ?, ?, null)";
 
         res.statusCode = 200;
         res.setHeader('content-type', 'text/plain;charset=UTF-8');
-        res.end(JSON.stringify("Vous données en été correctement enregistrer en BDD"));
+        
+        //console.log(req.body);
+        
+        await dbService.preparedStatement(sqlQuerry, [ dbuserId, zxuserId, userName, datePointage, heureArrivee, heureSortie, recordID]);
+        res.end(JSON.stringify(" [api] Vous données en été correctement enregistrer en BDD"));
+        //dbService.close();
+        
+    } catch (error) {
+        console.error(`error: ${error}`);
+        res.end(JSON.stringify("Une erreur ses produits pendant l'insertion en BDD"));
+    }
+})
+
+// Shoud be put method !
+route.post('/csharp/record/updateStatus', async (req, res) => {
+    try {
+        let recordID = req.body?.RecordID;
+        let status = req.body?.Status;
+        let sqlQuerry = "UPDATE pointages SET status = ? WHERE record_id = ?";
+
+        res.statusCode = 200;
+        res.setHeader('content-type', 'text/plain;charset=UTF-8');
+        res.end(JSON.stringify(" [api] Correctement mise à jour en BDD"));
 
         const jsonData = JSON.stringify(req.body);
         console.log(req.body);
         
-        await dbService.preparedStatement(sqlQuerry, [userId, userName, datePointage, heureArrivee, heureSortie]);
+        await dbService.preparedStatement(sqlQuerry, [ status, recordID]);
         //dbService.close();
         
     } catch (error) {
@@ -53,5 +77,22 @@ route.get('/csharp/get/:userid', async (req, res) => {
     }
 })
 
+route.get('/csharp/record/get', async (req, res) => {
+    try {
+        let records;
+        let sqlQuerry = "SELECT record_id, status, user_id FROM pointages";
 
+        await dbService.preparedStatement(sqlQuerry);
+        records = dbService.getResulsFetch();
+
+        res.statusCode = 200;
+        res.setHeader('content-type', 'application/json;charset=UTF-8');
+        console.log(records);
+        res.end(JSON.stringify(records));
+        
+    } catch (error) {
+        console.error(`error: ${error}`);
+        res.end(JSON.stringify("Une erreur ses produits pendant la récupération en BDD des records"));
+    }
+})
 export const csharpapp = route;
